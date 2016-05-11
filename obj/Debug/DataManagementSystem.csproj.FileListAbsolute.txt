@@ -1,0 +1,192 @@
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\GeekQuiz.dll.config
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\GeekQuiz.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\GeekQuiz.pdb
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Antlr3.Runtime.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\EntityFramework.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\EntityFramework.SqlServer.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.AspNet.Identity.Core.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.AspNet.Identity.EntityFramework.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.AspNet.Identity.Owin.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Host.SystemWeb.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Security.Cookies.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Security.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Security.Facebook.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Security.Google.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Security.MicrosoftAccount.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Security.OAuth.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Security.Twitter.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Newtonsoft.Json.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Owin.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Net.Http.Formatting.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.Helpers.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.Http.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.Http.WebHost.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.Mvc.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.Optimization.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.Razor.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.WebPages.Deployment.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.WebPages.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.WebPages.Razor.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\WebGrease.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.Helpers.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.Mvc.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.Optimization.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.Razor.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.WebPages.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.WebPages.Deployment.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.WebPages.Razor.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Newtonsoft.Json.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Antlr3.Runtime.pdb
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Net.Http.Formatting.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.Http.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\System.Web.Http.WebHost.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\EntityFramework.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\EntityFramework.SqlServer.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.AspNet.Identity.Core.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.AspNet.Identity.Owin.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.AspNet.Identity.EntityFramework.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Host.SystemWeb.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Security.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Security.Facebook.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Security.Cookies.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Security.OAuth.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Security.Google.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Security.Twitter.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\obj\Debug\DataManagementSystem.csprojResolveAssemblyReference.cache
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\obj\Debug\GeekQuiz.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\obj\Debug\GeekQuiz.pdb
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\DMS_DAL.dll
+C:\Users\eroma_000\Documents\Tutorials And Samples\Angular SPA WebAPI\GeekQuiz\bin\DMS_DAL.pdb
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\GeekQuiz.dll.config
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\GeekQuiz.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\GeekQuiz.pdb
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Antlr3.Runtime.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\DMS_DAL.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\EntityFramework.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\EntityFramework.SqlServer.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.AspNet.Identity.Core.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.AspNet.Identity.EntityFramework.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.AspNet.Identity.Owin.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Host.SystemWeb.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Cookies.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Facebook.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Google.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.MicrosoftAccount.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.OAuth.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Twitter.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Newtonsoft.Json.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Owin.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Net.Http.Formatting.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.Helpers.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.Http.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.Http.WebHost.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.Mvc.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.Optimization.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.Razor.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.WebPages.Deployment.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.WebPages.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.WebPages.Razor.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\WebGrease.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\DMS_DAL.pdb
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.Helpers.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.Mvc.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.Optimization.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.Razor.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.WebPages.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.WebPages.Deployment.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.WebPages.Razor.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Newtonsoft.Json.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Antlr3.Runtime.pdb
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Net.Http.Formatting.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.Http.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\System.Web.Http.WebHost.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\EntityFramework.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\EntityFramework.SqlServer.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.AspNet.Identity.Core.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.AspNet.Identity.Owin.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.AspNet.Identity.EntityFramework.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Host.SystemWeb.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Facebook.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Cookies.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.OAuth.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Google.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Twitter.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\obj\Debug\DataManagementSystem.csprojResolveAssemblyReference.cache
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\obj\Debug\GeekQuiz.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\obj\Debug\GeekQuiz.pdb
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\GeekQuiz.dll.config
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\GeekQuiz.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\GeekQuiz.pdb
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Antlr3.Runtime.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\DMS_DAL.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\EntityFramework.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\EntityFramework.SqlServer.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.AspNet.Identity.Core.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.AspNet.Identity.EntityFramework.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.AspNet.Identity.Owin.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Host.SystemWeb.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Cookies.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Facebook.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Google.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.MicrosoftAccount.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.OAuth.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Twitter.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Newtonsoft.Json.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Owin.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Net.Http.Formatting.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.Helpers.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.Http.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.Http.WebHost.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.Mvc.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.Optimization.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.Razor.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.WebPages.Deployment.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.WebPages.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.WebPages.Razor.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\WebGrease.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\DMS_DAL.pdb
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.Helpers.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.Mvc.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.Optimization.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.Razor.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.WebPages.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.WebPages.Deployment.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.WebPages.Razor.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Newtonsoft.Json.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Antlr3.Runtime.pdb
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Net.Http.Formatting.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.Http.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\System.Web.Http.WebHost.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\EntityFramework.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\EntityFramework.SqlServer.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.AspNet.Identity.Core.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.AspNet.Identity.Owin.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.AspNet.Identity.EntityFramework.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Host.SystemWeb.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Facebook.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Cookies.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.OAuth.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Google.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.Twitter.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\obj\Debug\DataManagementSystem.csprojResolveAssemblyReference.cache
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\obj\Debug\GeekQuiz.dll
+C:\Users\tom.reilly\Documents\GitHub\DMS\DMS\obj\Debug\GeekQuiz.pdb
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\UMS_Util.dll
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\UMS_Util.pdb
+C:\Users\eroma_000\Documents\GitHub\DMS\DMS\bin\UMS_Util.xml

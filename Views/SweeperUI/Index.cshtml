@@ -1,0 +1,192 @@
+﻿@{
+    ViewBag.Title = "USHC Sweeper";
+}
+
+<div id="bodyContainer" ng-app="SweeperUIApp">
+    <section id="content">
+        <div class="container">
+            <div class="row">
+                <div class="text-center col-md-12" ng-controller="SweeperUICtrl">
+                    <div tabset>
+                        <div class="floatfix" tab heading="Diagnoses by Group" select="tabSelectDiagnosesByGroup();">
+                            <div class="tab-contents">
+                                <div class="floatfix scb-display headers">
+                                    <div class="scb-cell-left" ng-click="clickDiagnosesGroupSort('DiagnosticGroup')">Diag Group<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesGroup.sort == 'DiagnosticGroup' && SCB.DiagnosesGroup.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesGroup.sort == 'DiagnosticGroup' && !SCB.DiagnosesGroup.sortAsc }"></span></div>
+                                    <div class="scb-cell-medium-wide-left" ng-click="clickDiagnosesGroupSort('GroupName')">Description<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesGroup.sort == 'GroupName' && SCB.DiagnosesGroup.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesGroup.sort == 'GroupNameShort' && !SCB.DiagnosesGroup.sortAsc }"></span></div>
+                                    <div class="scb-cell-right" ng-click="clickDiagnosesGroupSort('ClaimTotalRaw')">Claim Total<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesGroup.sort == 'ClaimTotalRaw' && SCB.DiagnosesGroup.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesGroup.sort == 'ClaimTotalRaw' && !SCB.DiagnosesGroup.sortAsc }"></span></div>
+                                    <div class="scb-cell-center" ng-click="clickDiagnosesGroupSort('ClaimCount')">Claim Count<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesGroup.sort == 'ClaimCount' && SCB.DiagnosesGroup.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesGroup.sort == 'ClaimCount' && !SCB.DiagnosesGroup.sortAsc }"></span></div>
+                                    <div class="scb-cell-center" ng-click="clickDiagnosesGroupSort('PatientCount')">Patient Count<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesGroup.sort == 'PatientCount' && SCB.DiagnosesGroup.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesGroup.sort == 'PatientCount' && !SCB.DiagnosesGroup.sortAsc }"></span></div>
+                                    <div class="scb-cell-center" ng-click="clickDiagnosesGroupSort('ProviderCount')">Provider Count<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesGroup.sort == 'ProviderCount' && SCB.DiagnosesGroup.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesGroup.sort == 'ProviderCount' && !SCB.DiagnosesGroup.sortAsc }"></span></div>
+                                </div>
+                                <div class="floatfix scb-display scb-grid" ng-repeat="diagnosis in SCB.DiagnosesGroupPage">
+                                    <div class="scb-cell-left">{{diagnosis.DiagnosticGroup}}</div>
+                                    <div class="scb-cell-medium-wide-left" tooltip="{{diagnosis.GroupName}}">{{diagnosis.GroupName}}</div>
+                                    <div class="scb-cell-right">{{diagnosis.ClaimTotal}}</div>
+                                    <div class="scb-cell-center">{{diagnosis.ClaimCount}}</div>
+                                    <div class="scb-cell-center">{{diagnosis.PatientCount}}</div>
+                                    <div class="scb-cell-center">{{diagnosis.ProviderCount}}</div>
+                                </div>
+                                <div class="scb-display-pager floatfix">
+                                    <div class="disabled">Page #</div>
+                                    <div class="ushc-paper-icon-angle-double-left" ng-class="{disabled:SCB.DiagnosesGroup.pageIndex == 0}" ng-click="clickDiagnosesGroupPage(0)"></div>
+                                    <div ng-class="{active:SCB.DiagnosesGroup.pageIndex == page - 1}" ng-repeat="page in SCB.DiagnosesGroup.visiblePages" ng-click="clickDiagnosesGroupPage(page - 1)">{{page}}</div>
+                                    <div class="ushc-paper-icon-angle-double-right" ng-class="{disabled:SCB.DiagnosesGroup.pageIndex == SCB.DiagnosesGroup.pages.length - 1}" ng-click="clickDiagnosesGroupPage(SCB.DiagnosesGroup.pages.length - 1)"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="floatfix" tab heading="Diagnoses by Subgroup" select="tabSelectDiagnosesBySubgroup();">
+                            <div class="tab-contents">
+                                <div class="floatfix scb-display headers">
+                                    <div class="scb-cell-left" ng-click="clickDiagnosesSubgroupSort('DiagnosticSubgroup')">Diag Subgrp<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesSubgroup.sort == 'DiagnosticSubgroup' && SCB.DiagnosesSubgroup.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesSubgroup.sort == 'DiagnosticSubgroup' && !SCB.DiagnosesSubgroup.sortAsc }"></span></div>
+                                    <div class="scb-cell-wide-left" ng-click="clickDiagnosesSubgroupSort('SubgroupName')">Subgroup Name<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesSubgroup.sort == 'SubgroupName' && SCB.DiagnosesSubgroup.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesSubgroup.sort == 'SubgroupName' && !SCB.DiagnosesSubgroup.sortAsc }"></span></div>
+                                    <div class="scb-cell-right" ng-click="clickDiagnosesSubgroupSort('ClaimTotalRaw')">Claim Total<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesSubgroup.sort == 'ClaimTotalRaw' && SCB.DiagnosesSubgroup.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesSubgroup.sort == 'ClaimTotalRaw' && !SCB.DiagnosesSubgroup.sortAsc }"></span></div>
+                                    <div class="scb-cell-center" ng-click="clickDiagnosesSubgroupSort('ClaimCount')">Claim Count<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesSubgroup.sort == 'ClaimCount' && SCB.DiagnosesSubgroup.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesSubgroup.sort == 'ClaimCount' && !SCB.DiagnosesSubgroup.sortAsc }"></span></div>
+                                    <div class="scb-cell-center" ng-click="clickDiagnosesSubgroupSort('PatientCount')">Patient Count<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesSubgroup.sort == 'PatientCount' && SCB.DiagnosesSubgroup.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesSubgroup.sort == 'PatientCount' && !SCB.DiagnosesSubgroup.sortAsc }"></span></div>
+                                    <div class="scb-cell-center" ng-click="clickDiagnosesSubgroupSort('ProviderCount')">Provider Count<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesSubgroup.sort == 'ProviderCount' && SCB.DiagnosesSubgroup.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesSubgroup.sort == 'ProviderCount' && !SCB.DiagnosesSubgroup.sortAsc }"></span></div>
+                                </div>
+                                <div class="floatfix scb-display scb-grid" ng-repeat="diagnosis in SCB.DiagnosesSubgroupPage">
+                                    <div class="scb-cell-left">{{diagnosis.DiagnosticSubgroup}}</div>
+                                    <div class="scb-cell-wide-left" tooltip="{{diagnosis.SubgroupName}}">{{diagnosis.SubgroupName}}</div>
+                                    <div class="scb-cell-right">{{diagnosis.ClaimTotal}}</div>
+                                    <div class="scb-cell-center">{{diagnosis.ClaimCount}}</div>
+                                    <div class="scb-cell-center">{{diagnosis.PatientCount}}</div>
+                                    <div class="scb-cell-center">{{diagnosis.ProviderCount}}</div>
+                                </div>
+                                <div class="scb-display-pager floatfix">
+                                    <div class="disabled">Page #</div>
+                                    <div class="ushc-paper-icon-angle-double-left" ng-class="{disabled:SCB.DiagnosesSubgroup.pageIndex == 0}" ng-click="clickDiagnosesSubgroupPage(0)"></div>
+                                    <div ng-class="{active:SCB.DiagnosesSubgroup.pageIndex == page - 1}" ng-repeat="page in SCB.DiagnosesSubgroup.visiblePages" ng-click="clickDiagnosesSubgroupPage(page - 1)">{{page}}</div>
+                                    <div class="ushc-paper-icon-angle-double-right" ng-class="{disabled:SCB.DiagnosesSubgroup.pageIndex == SCB.DiagnosesSubgroup.pages.length - 1}" ng-click="clickDiagnosesSubgroupPage(SCB.DiagnosesSubgroup.pages.length - 1)"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="floatfix" tab heading="Diagnoses by ICD" select="tabSelectDiagnosesByICD();">
+                            <div class="tab-contents">
+                                <div class="floatfix scb-display headers">
+                                    <div class="scb-cell-left" ng-click="clickDiagnosesICDSort('ICDCode')">ICD Code<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesICD.sort == 'ICDCode' && SCB.DiagnosesICD.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesICD.sort == 'ICDCode' && !SCB.DiagnosesICD.sortAsc }"></span></div>
+                                    <div class="scb-cell-medium-left" ng-click="clickDiagnosesICDSort('DescriptionShort')">Description<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesICD.sort == 'DescriptionShort' && SCB.DiagnosesICD.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesICD.sort == 'DescriptionShort' && !SCB.DiagnosesICD.sortAsc }"></span></div>
+                                    <div class="scb-cell-right" ng-click="clickDiagnosesICDSort('ClaimTotalRaw')">Claim Total<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesICD.sort == 'ClaimTotalRaw' && SCB.DiagnosesICD.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesICD.sort == 'ClaimTotalRaw' && !SCB.DiagnosesICD.sortAsc }"></span></div>
+                                    <div class="scb-cell-center" ng-click="clickDiagnosesICDSort('ClaimCount')">Claim Count<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesICD.sort == 'ClaimCount' && SCB.DiagnosesICD.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesICD.sort == 'ClaimCount' && !SCB.DiagnosesICD.sortAsc }"></span></div>
+                                    <div class="scb-cell-center" ng-click="clickDiagnosesICDSort('PatientCount')">Patient Count<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesICD.sort == 'PatientCount' && SCB.DiagnosesICD.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesICD.sort == 'PatientCount' && !SCB.DiagnosesICD.sortAsc }"></span></div>
+                                    <div class="scb-cell-center" ng-click="clickDiagnosesICDSort('ProviderCount')">Provider Count<span ng-class="{'ushc-paper-icon-chevron-down':SCB.DiagnosesICD.sort == 'ProviderCount' && SCB.DiagnosesICD.sortAsc, 'ushc-paper-icon-chevron-up':SCB.DiagnosesICD.sort == 'ProviderCount' && !SCB.DiagnosesICD.sortAsc }"></span></div>
+                                </div>
+                                <div class="floatfix scb-display scb-grid" ng-repeat="diagnosis in SCB.DiagnosesICDPage">
+                                    <div class="scb-cell-left">{{diagnosis.ICDCode}}</div>
+                                    <div class="scb-cell-medium-left" tooltip="{{diagnosis.DescriptionLong}}">{{diagnosis.DescriptionShort}}</div>
+                                    <div class="scb-cell-right">{{diagnosis.ClaimTotal}}</div>
+                                    <div class="scb-cell-center">{{diagnosis.ClaimCount}}</div>
+                                    <div class="scb-cell-center">{{diagnosis.PatientCount}}</div>
+                                    <div class="scb-cell-center">{{diagnosis.ProviderCount}}</div>
+                                </div>
+                                <div class="scb-display-pager floatfix">
+                                    <div class="disabled">Page #</div>
+                                    <div class="ushc-paper-icon-angle-double-left" ng-class="{disabled:SCB.DiagnosesICD.pageIndex == 0}" ng-click="clickDiagnosesICDPage(0)"></div>
+                                    <div ng-class="{active:SCB.DiagnosesICD.pageIndex == page - 1}" ng-repeat="page in SCB.DiagnosesICD.visiblePages" ng-click="clickDiagnosesICDPage(page - 1)">{{page}}</div>
+                                    <div class="ushc-paper-icon-angle-double-right" ng-class="{disabled:SCB.DiagnosesICD.pageIndex == SCB.DiagnosesICD.pages.length - 1}" ng-click="clickDiagnosesICDPage(SCB.DiagnosesICD.pages.length - 1)"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="floatfix" tab heading="Patients" select="tabSelectPatients();">
+                            <div class="tab-contents">
+                                <div class="floatfix scb-display headers">
+                                    <div class="scb-cell-wide-left" ng-click="clickPatientsSort('FullName')">Full Name<span ng-class="{'ushc-paper-icon-chevron-down':SCB.Patients.sort == 'FullName' && SCB.Patients.sortAsc, 'ushc-paper-icon-chevron-up':SCB.Patients.sort == 'FullName' && !SCB.Patients.sortAsc }"></span></div>
+                                    <div class="scb-cell-left" ng-click="clickPatientsSort('MemberId')">Member ID<span ng-class="{'ushc-paper-icon-chevron-down':SCB.Patients.sort == 'MemberId' && SCB.Patients.sortAsc, 'ushc-paper-icon-chevron-up':SCB.Patients.sort == 'MemberId' && !SCB.Patients.sortAsc }"></span></div>
+                                    <div class="scb-cell-right" ng-click="clickPatientsSort('ClaimTotalRaw')">Claim Total<span ng-class="{'ushc-paper-icon-chevron-down':SCB.Patients.sort == 'ClaimTotalRaw' && SCB.Patients.sortAsc, 'ushc-paper-icon-chevron-up':SCB.Patients.sort == 'ClaimTotalRaw' && !SCB.Patients.sortAsc }"></span></div>
+                                    <div class="scb-cell-center" ng-click="clickPatientsSort('ClaimCount')">Claim Count<span ng-class="{'ushc-paper-icon-chevron-down':SCB.Patients.sort == 'ClaimCount' && SCB.Patients.sortAsc, 'ushc-paper-icon-chevron-up':SCB.Patients.sort == 'ClaimCount' && !SCB.Patients.sortAsc }"></span></div>
+                                </div>
+                                <div class="floatfix scb-display scb-grid" ng-repeat="patient in SCB.PatientsPage">
+                                    <div class="scb-cell-wide-left" tooltip="{{provider.FullName}}">{{patient.FullName}}</div>
+                                    <div class="scb-cell-left">{{patient.MemberId}}</div>
+                                    <div class="scb-cell-right">{{patient.ClaimTotal}}</div>
+                                    <div class="scb-cell-center">{{patient.ClaimCount}}</div>
+                                </div>
+                                <div class="scb-display-pager floatfix">
+                                    <div class="disabled">Page #</div>
+                                    <div class="ushc-paper-icon-angle-double-left" ng-class="{disabled:SCB.Patients.pageIndex == 0}" ng-click="clickPatientsPage(0)"></div>
+                                    <div ng-class="{active:SCB.Patients.pageIndex == page - 1}" ng-repeat="page in SCB.Patients.visiblePages" ng-click="clickPatientsPage(page - 1)">{{page}}</div>
+                                    <div class="ushc-paper-icon-angle-double-right" ng-class="{disabled:SCB.Patients.pageIndex == SCB.Patients.pages.length - 1}" ng-click="clickPatientsPage(SCB.Patients.pages.length - 1)"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="floatfix" tab heading="Providers" select="tabSelectProviders();">
+                            <div class="tab-contents">
+                                <div class="floatfix scb-display headers">
+                                    <div class="scb-cell-wide-left" ng-click="clickProvidersSort('FullName')">Full Name<span ng-class="{'ushc-paper-icon-chevron-down':SCB.Providers.sort == 'FullName' && SCB.Providers.sortAsc, 'ushc-paper-icon-chevron-up':SCB.Providers.sort == 'FullName' && !SCB.Providers.sortAsc }"></span></div>
+                                    <div class="scb-cell-left" ng-click="clickProvidersSort('NPI')">NPI Code<span ng-class="{'ushc-paper-icon-chevron-down':SCB.Providers.sort == 'NPI' && SCB.Providers.sortAsc, 'ushc-paper-icon-chevron-up':SCB.Providers.sort == 'NPI' && !SCB.Providers.sortAsc }"></span></div>
+                                    <div class="scb-cell-right" ng-click="clickProvidersSort('ClaimTotalRaw')">Claim Total<span ng-class="{'ushc-paper-icon-chevron-down':SCB.Providers.sort == 'ClaimTotalRaw' && SCB.Providers.sortAsc, 'ushc-paper-icon-chevron-up':SCB.Providers.sort == 'ClaimTotalRaw' && !SCB.Providers.sortAsc }"></span></div>
+                                    <div class="scb-cell-center" ng-click="clickProvidersSort('ClaimCount')">Claim Count<span ng-class="{'ushc-paper-icon-chevron-down':SCB.Providers.sort == 'ClaimCount' && SCB.Providers.sortAsc, 'ushc-paper-icon-chevron-up':SCB.Providers.sort == 'ClaimCount' && !SCB.Providers.sortAsc }"></span></div>
+                                </div>
+                                <div class="floatfix scb-display scb-grid" ng-repeat="provider in SCB.ProvidersPage">
+                                    <div class="scb-cell-wide-left" tooltip="{{provider.FullName}}">{{provider.FullName}}</div>
+                                    <div class="scb-cell-left">{{provider.Npi}}</div>
+                                    <div class="scb-cell-right">{{provider.ClaimTotal}}</div>
+                                    <div class="scb-cell-center">{{provider.ClaimCount}}</div>
+                                </div>
+                                <div class="scb-display-pager floatfix">
+                                    <div class="disabled">Page #</div>
+                                    <div class="ushc-paper-icon-angle-double-left" ng-class="{disabled:SCB.Providers.pageIndex == 0}" ng-click="clickProvidersPage(0)"></div>
+                                    <div ng-class="{active:SCB.Providers.pageIndex == page - 1}" ng-repeat="page in SCB.Providers.visiblePages" ng-click="clickProvidersPage(page - 1)">{{page}}</div>
+                                    <div class="ushc-paper-icon-angle-double-right" ng-class="{disabled:SCB.Providers.pageIndex == SCB.Providers.pages.length - 1}" ng-click="clickProvidersPage(SCB.Providers.pages.length - 1)"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="floatfix" tab heading="Procedures" select="tabSelectProcedures();">
+                            <div class="tab-contents">
+                                <div class="floatfix scb-display headers">
+                                    <div class="scb-cell-left" ng-click="clickProceduresSort('ProcedureCode')">Proc Code<span ng-class="{'ushc-paper-icon-chevron-down':SCB.Procedures.sort == 'ProcedureCode' && SCB.Procedures.sortAsc, 'ushc-paper-icon-chevron-up':SCB.Procedures.sort == 'ProcedureCode' && !SCB.Procedures.sortAsc }"></span></div>
+                                    <div class="scb-cell-wide-left" ng-click="clickProceduresSort('Description')">Proc Description<span ng-class="{'ushc-paper-icon-chevron-down':SCB.Procedures.sort == 'Description' && SCB.Procedures.sortAsc, 'ushc-paper-icon-chevron-up':SCB.Procedures.sort == 'Description' && !SCB.Procedures.sortAsc }"></span></div>
+                                    <div class="scb-cell-right" ng-click="clickProceduresSort('ProcedureTotalRaw')">Proc Total<span ng-class="{'ushc-paper-icon-chevron-down':SCB.Procedures.sort == 'ProcedureTotalRaw' && SCB.Procedures.sortAsc, 'ushc-paper-icon-chevron-up':SCB.Procedures.sort == 'ProcedureTotalRaw' && !SCB.Procedures.sortAsc }"></span></div>
+                                    <div class="scb-cell-center" ng-click="clickProceduresSort('ProcedureCount')">Proc Count<span ng-class="{'ushc-paper-icon-chevron-down':SCB.Procedures.sort == 'ProcedureCount' && SCB.Procedures.sortAsc, 'ushc-paper-icon-chevron-up':SCB.Procedures.sort == 'ProcedureCount' && !SCB.Procedures.sortAsc }"></span></div>
+                                </div>
+                                <div class="floatfix scb-display scb-grid" ng-repeat="procedure in SCB.ProceduresPage">
+                                    <div class="scb-cell-left">{{procedure.ProcedureCode}}</div>
+                                    <div class="scb-cell-wide-left">{{procedure.Description}}</div>
+                                    <div class="scb-cell-right">{{procedure.ProcedureTotal}}</div>
+                                    <div class="scb-cell-center">{{procedure.ProcedureCount}}</div>
+                                </div>
+                                <div class="scb-display-pager floatfix">
+                                    <div class="disabled">Page #</div>
+                                    <div class="ushc-paper-icon-angle-double-left" ng-class="{disabled:SCB.Procedures.pageIndex == 0}" ng-click="clickProceduresPage(0)"></div>
+                                    <div ng-class="{active:SCB.Procedures.pageIndex == page - 1}" ng-repeat="page in SCB.Procedures.visiblePages" ng-click="clickProceduresPage(page - 1)">{{page}}</div>
+                                    <div class="ushc-paper-icon-angle-double-right" ng-class="{disabled:SCB.Procedures.pageIndex == SCB.Procedures.pages.length - 1}" ng-click="clickProceduresPage(SCB.Procedures.pages.length - 1)"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="floatfix" tab heading="Claims" select="tabSelectClaimCosts();">
+                            <div class="tab-contents">
+                                <div class="floatfix scb-display headers">
+                                    <div class="scb-cell-left" ng-click="clickClaimCostsSort('StatementDate')">Stmt Date<span ng-class="{'ushc-paper-icon-chevron-down':SCB.ClaimCosts.sort == 'StatementDate' && SCB.ClaimCosts.sortAsc, 'ushc-paper-icon-chevron-up':SCB.ClaimCosts.sort == 'StatementDate' && !SCB.ClaimCosts.sortAsc }"></span></div>
+                                    <div class="scb-cell-wide-left" ng-click="clickClaimCostsSort('FullName')">Full Name<span ng-class="{'ushc-paper-icon-chevron-down':SCB.ClaimCosts.sort == 'FullName' && SCB.ClaimCosts.sortAsc, 'ushc-paper-icon-chevron-up':SCB.ClaimCosts.sort == 'FullName' && !SCB.ClaimCosts.sortAsc }"></span></div>
+                                    <div class="scb-cell-left" ng-click="clickClaimCostsSort('DateOfBirth')">Date Of Birth<span ng-class="{'ushc-paper-icon-chevron-down':SCB.ClaimCosts.sort == 'DateOfBirth' && SCB.ClaimCosts.sortAsc, 'ushc-paper-icon-chevron-up':SCB.ClaimCosts.sort == 'DateOfBirth' && !SCB.ClaimCosts.sortAsc }"></span></div>
+                                    <div class="scb-cell-right" ng-click="clickClaimCostsSort('TotalClaimRaw')">Claim Total<span ng-class="{'ushc-paper-icon-chevron-down':SCB.ClaimCosts.sort == 'TotalClaimRaw' && SCB.ClaimCosts.sortAsc, 'ushc-paper-icon-chevron-up':SCB.ClaimCosts.sort == 'TotalClaimRaw' && !SCB.ClaimCosts.sortAsc }"></span></div>
+                                </div>
+                                <div class="floatfix scb-display scb-grid" ng-repeat="claim in SCB.ClaimCostsPage">
+                                    <div class="scb-cell-left">{{claim.StatementDate}}</div>
+                                    <div class="scb-cell-wide-left" tooltip="{{claim.FullName}}">{{claim.FullName}}</div>
+                                    <div class="scb-cell-left">{{claim.DateOfBirth}}</div>
+                                    <div class="scb-cell-right">{{claim.TotalClaim}}</div>
+                                </div>
+                                <div class="scb-display-pager floatfix">
+                                    <div class="disabled">Page #</div>
+                                    <div class="ushc-paper-icon-angle-double-left" ng-class="{disabled:SCB.ClaimCosts.pageIndex == 0}" ng-click="clickClaimCostsPage(0)"></div>
+                                    <div ng-class="{active:SCB.ClaimCosts.pageIndex == page - 1}" ng-repeat="page in SCB.ClaimCosts.visiblePages" ng-click="clickClaimCostsPage(page - 1)">{{page}}</div>
+                                    <div class="ushc-paper-icon-angle-double-right" ng-class="{disabled:SCB.ClaimCosts.pageIndex == SCB.ClaimCosts.pages.length - 1}" ng-click="clickClaimCostsPage(SCB.ClaimCosts.pages.length - 1)"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section scripts {
+    @Styles.Render("~/Content/SweeperUI.css")
+    @Styles.Render("~/fonts/styles.css")
+    @Scripts.Render("~/Scripts/moment.min.js")
+    @Scripts.Render("~/Scripts/angular.js")
+    @Scripts.Render("~/Scripts/angular-ui/ui-bootstrap-tpls.min.js")
+    @Scripts.Render("~/Scripts/app/SweeperUI-controller.js")
+    @Scripts.Render("~/Scripts/app/ClaimManager.js")
+}

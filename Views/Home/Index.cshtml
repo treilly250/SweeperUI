@@ -1,0 +1,74 @@
+﻿@{
+    ViewBag.Title = "USHC Sweeper";
+}
+
+<div class="SweeperUI-tool floatfix">
+    <img src='@Url.Content("~/Content/home_pcimg.jpg")' />
+    <p class="text">Explore your claims from a variety of perspectives.</p>
+</div>
+@section scripts {
+    @Scripts.Render("~/Scripts/angular.js")
+    @Styles.Render("~/fonts/styles.css")
+}
+
+<style>
+    .SweeperUI-link-big {
+        margin-left: 25px;
+        margin-top: 25px;
+        float: left;
+        text-align: center;
+        background-color: white;
+        border: solid 1px #269abc;
+        border-radius: 3px;
+        width: 225px;
+        color: #269abc;
+        height: 200px;
+
+    }
+    .SweeperUI-link-big:hover {
+        background-color:#269abc;
+        color: white;
+    }
+    .SweeperUI-link-big:hover>a {
+        background-color:#269abc;
+        color: white;
+    }
+    .SweeperUI-link-big>a>.icon {
+        font-size: 96px;
+        padding-top: 45px;
+    }
+    .SweeperUI-link-big>a>.text {
+        padding-bottom: 25px;
+    }
+    .SweeperUI-link-big>a {
+        width: 100%;
+        height: 100%;
+        text-decoration: none;
+        color: #269abc;
+    }
+     .SweeperUI-link {
+         float: left;
+         background-color:white;
+         color: #269abc;
+         cursor: pointer;
+         width: 250px;
+         border-radius: 3px;
+         text-align: center;
+         border: solid 1px #269abc;
+         margin-right: 15px;
+     }
+    .SweeperUI-link:hover {
+        background-color:#269abc;
+        color: white;
+    }
+    .SweeperUI-link>a {
+        text-decoration: none;
+        color: #269abc;
+    }
+    .SweeperUI-link:hover>a {
+        color: white;
+    }
+    .SweeperUI-tool {
+        line-height: 45px;
+    }
+</style>

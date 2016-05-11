@@ -1,0 +1,303 @@
+﻿    .tmp-hide {
+        display: none !important;
+    }
+
+    .sub-title > .warning {
+        color: #c00;
+        font-size: 10px;
+        margin-left: 10px;
+    }
+
+    .filter > .warning {
+        color: #c00;
+        font-size: 8px;
+        margin-left: 15px;
+    }
+
+    .tab-contents {
+        border-left: solid 1px #ddd;
+        border-right: solid 1px #ddd;
+        position: relative;
+        min-height: 460px;
+        border-bottom: solid 1px #ddd;
+    }
+
+    .tooltip-inner {
+        white-space:pre-wrap;
+    }
+
+    .scb-grid {
+    }
+
+    .scb-display-pager > div {
+        color: #999;
+        cursor: pointer;
+        float: left;
+        margin-left: 5px;
+        width: 25px;
+    }
+
+    .scb-display-pager-no-hover > div {
+        color: #999;
+        cursor: pointer;
+        float: left;
+        margin-left: 5px;
+        width: 25px;
+    }
+
+        .scb-display-pager > div:first-child {
+            width: 60px;
+        }
+
+        .scb-display-pager > div:snapshot-btn {
+            width: 140px;
+        }
+
+        .scb-display-pager > div:hover {
+            color: #00bcf2;
+        }
+
+        .scb-display-pager > div.disabled {
+            color: #ccc;
+            cursor: default;
+        }
+
+            .scb-display-pager > div.disabled:hover {
+                color: #ccc;
+                cursor: default;
+            }
+
+        .scb-display-pager > div.active {
+            color: #00bcf2;
+            cursor: default;
+        }
+
+            .scb-display-pager > div.active:hover {
+                color: #00bcf2;
+                cursor: default;
+            }
+
+    .scb-display.headers:hover {
+        background-color: #fff;
+        color: #000;
+    }
+
+    .scb-display-pager {
+        text-align: left;
+        font-size: 16px;
+        padding: 3px;
+        line-height: 35px;
+    }
+
+    .sort-icon:before {
+        content: "";
+    }
+
+    .scb-display {
+        height: 35px;
+        line-height: 40px;
+        border-bottom: solid 1px #e9e9e9;
+        cursor: pointer;
+    }
+
+        .scb-display:hover {
+            background-color: #00bcf2;
+            color: white;
+        }
+
+        .scb-display.headers {
+            height: 35px;
+            line-height: 35px;
+            border-bottom: solid 1px #e9e9e9;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+            .scb-display.headers > div > span {
+                margin-left: 5px;
+            }
+
+    .scb-cell-left {
+        float: left;
+        width: 105px;
+        height: 35px;
+        line-height: 35px;
+        text-align: left;
+        overflow-x: hidden;
+        white-space: nowrap;
+        padding-left:3px;
+        padding-right:3px;
+    }
+
+    .scb-cell-center {
+        float: left;
+        width: 105px;
+        height: 35px;
+        line-height: 35px;
+        text-align: center;
+        overflow-x: hidden;
+        white-space: nowrap;
+        padding-left:3px;
+        padding-right:3px;
+    }
+
+    .scb-cell-right {
+        float: left;
+        width: 105px;
+        height: 35px;
+        line-height: 35px;
+        text-align: right;
+        overflow-x: hidden;
+        white-space: nowrap;
+        padding-left:3px;
+        padding-right:3px;
+    }
+
+    .scb-cell-medium-left {
+        float: left;
+        width: 160px;
+        height: 35px;
+        line-height: 35px;
+        text-align: left;
+        overflow-x: hidden;
+        white-space: nowrap;
+        padding-left:3px;
+        padding-right:3px;
+    }
+
+    .scb-cell-medium-center {
+        float: left;
+        width: 160px;
+        height: 35px;
+        line-height: 35px;
+        text-align: center;
+        overflow-x: hidden;
+        white-space: nowrap;
+        padding-left:3px;
+        padding-right:3px;
+    }
+
+    .scb-cell-medium-wide-left {
+        float: left;
+        width: 200px;
+        height: 35px;
+        line-height: 35px;
+        text-align: left;
+        overflow-x: hidden;
+        white-space: nowrap;
+        padding-left:3px;
+        padding-right:3px;
+    }
+
+    .scb-cell-medium-wide-center {
+        float: left;
+        width: 200px;
+        height: 35px;
+        line-height: 35px;
+        text-align: center;
+        overflow-x: hidden;
+        white-space: nowrap;
+        padding-left:3px;
+        padding-right:3px;
+    }
+
+    .scb-cell-wide-left {
+        float: left;
+        width: 275px;
+        height: 35px;
+        line-height: 35px;
+        text-align: left;
+        overflow-x: hidden;
+        white-space: nowrap;
+        padding-left:3px;
+        padding-right:3px;
+    }
+
+    .scb-cell-wide-center {
+        float: left;
+        width: 275px;
+        height: 35px;
+        line-height: 35px;
+        text-align: center;
+        overflow-x: hidden;
+        white-space: nowrap;
+        padding-left:3px;
+        padding-right:3px;
+    }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        height: 34px;
+        padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.428571429;
+        color: #555555;
+        vertical-align: middle;
+        background-color: #ffffff;
+        border: 1px solid #cccccc;
+        border-radius: 4px;
+        -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+                box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+        -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+                transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+    }
+
+    .input-box {
+        float:left;
+        margin-left:12px;
+        width:175px;
+        margin-bottom: 3px;
+        margin-top: 3px;
+    }
+        .input-box:first-child {
+            margin-left:0px;
+        }
+
+    .filter-btn {
+        float: left;
+        margin-left:12px;
+        width: 100px;
+        margin-bottom: 3px;
+        margin-top: 10px;
+    }
+
+    .scb-close-btn {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        padding: 5px;
+        font-size: 22px;
+        color: #999;
+        cursor: pointer;
+    }
+
+        .scb-close-btn:hover {
+            color: #00bcf2;
+        }
+
+    .snapshot-btn {
+        width: 90px;
+        padding-left: 1px;
+        padding-right: 1px;
+        padding-bottom: 1px;
+        padding-top: 1px;
+        border-radius: 3px;
+        background-color: white;
+        color: black;
+        cursor: pointer;
+        text-align: left;
+    }
+
+    .snapshot-no-btn {
+        width: 90px;
+        padding-left: 1px;
+        padding-right: 1px;
+        padding-bottom: 1px;
+        padding-top: 1px;
+        border-radius: 3px;
+        background-color: white;
+        color: black;
+        cursor: pointer;
+        text-align: left;
+    }

@@ -1,0 +1,304 @@
+@charset "UTF-8";
+
+@font-face {
+  font-family: "ushc-paper-icons";
+  src:url("fonts/ushc-paper-icons.eot");
+  src:url("fonts/ushc-paper-icons.eot?#iefix") format("embedded-opentype"),
+    url("fonts/ushc-paper-icons.woff") format("woff"),
+    url("fonts/ushc-paper-icons.ttf") format("truetype"),
+    url("fonts/ushc-paper-icons.svg#ushc-paper-icons") format("svg");
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+[data-icon]:before {
+  font-family: "ushc-paper-icons" !important;
+  content: attr(data-icon);
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  speak: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[class^="ushc-paper-icon-"]:before,
+[class*=" ushc-paper-icon-"]:before {
+  font-family: "ushc-paper-icons" !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  speak: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ushc-paper-icon-check-mark:before {
+  content: "a";
+}
+.ushc-paper-icon-arrow-right:before {
+  content: "b";
+}
+.ushc-paper-icon-arrow-up:before {
+  content: "c";
+}
+.ushc-paper-icon-arrow-left:before {
+  content: "d";
+}
+.ushc-paper-icon-arrow-down:before {
+  content: "e";
+}
+.ushc-paper-icon-backward:before {
+  content: "f";
+}
+.ushc-paper-icon-arrow-vertical:before {
+  content: "g";
+}
+.ushc-paper-icon-arrow-up-1:before {
+  content: "h";
+}
+.ushc-paper-icon-arrow-right-1:before {
+  content: "i";
+}
+.ushc-paper-icon-arrow-left-1:before {
+  content: "j";
+}
+.ushc-paper-icon-arrow-horizontal:before {
+  content: "k";
+}
+.ushc-paper-icon-arrow-down-1:before {
+  content: "l";
+}
+.ushc-paper-icon-angle-up:before {
+  content: "m";
+}
+.ushc-paper-icon-angle-right:before {
+  content: "n";
+}
+.ushc-paper-icon-angle-left:before {
+  content: "o";
+}
+.ushc-paper-icon-angle-down:before {
+  content: "p";
+}
+.ushc-paper-icon-align-justify:before {
+  content: "q";
+}
+.ushc-paper-icon-align-justify-1:before {
+  content: "r";
+}
+.ushc-paper-icon-align-center:before {
+  content: "s";
+}
+.ushc-paper-icon-align-left:before {
+  content: "t";
+}
+.ushc-paper-icon-align-right:before {
+  content: "u";
+}
+.ushc-paper-icon-angle-double-down:before {
+  content: "v";
+}
+.ushc-paper-icon-angle-double-left:before {
+  content: "w";
+}
+.ushc-paper-icon-angle-double-right:before {
+  content: "x";
+}
+.ushc-paper-icon-angle-double-up:before {
+  content: "y";
+}
+.ushc-paper-icon-arrow-circle-down:before {
+  content: "z";
+}
+.ushc-paper-icon-arrow-circle-down-line:before {
+  content: "A";
+}
+.ushc-paper-icon-arrow-circle-left:before {
+  content: "B";
+}
+.ushc-paper-icon-arrow-circle-right:before {
+  content: "C";
+}
+.ushc-paper-icon-arrow-circle-right-line:before {
+  content: "D";
+}
+.ushc-paper-icon-arrow-circle-up:before {
+  content: "E";
+}
+.ushc-paper-icon-arrow-circle-up-line:before {
+  content: "F";
+}
+.ushc-paper-icon-chevron-down:before {
+  content: "J";
+}
+.ushc-paper-icon-caret-up:before {
+  content: "G";
+}
+.ushc-paper-icon-caret-up-down:before {
+  content: "H";
+}
+.ushc-paper-icon-caret-up-two:before {
+  content: "I";
+}
+.ushc-paper-icon-caret-left:before {
+  content: "K";
+}
+.ushc-paper-icon-caret-right:before {
+  content: "L";
+}
+.ushc-paper-icon-caret-down:before {
+  content: "M";
+}
+.ushc-paper-icon-caret-down-two:before {
+  content: "N";
+}
+.ushc-paper-icon-fast-backward:before {
+  content: "O";
+}
+.ushc-paper-icon-fast-forward:before {
+  content: "P";
+}
+.ushc-paper-icon-forward:before {
+  content: "Q";
+}
+.ushc-paper-icon-zoom-in:before {
+  content: "R";
+}
+.ushc-paper-icon-zoom-out:before {
+  content: "S";
+}
+.ushc-paper-icon-youtube-play:before {
+  content: "T";
+}
+.ushc-paper-icon-youtube:before {
+  content: "U";
+}
+.ushc-paper-icon-youtube-square:before {
+  content: "V";
+}
+.ushc-paper-icon-unlike:before {
+  content: "W";
+}
+.ushc-paper-icon-stackoverflow:before {
+  content: "X";
+}
+.ushc-paper-icon-signal:before {
+  content: "Y";
+}
+.ushc-paper-icon-reply-mail:before {
+  content: "Z";
+}
+.ushc-paper-icon-reply-all:before {
+  content: "0";
+}
+.ushc-paper-icon-power-off:before {
+  content: "1";
+}
+.ushc-paper-icon-repeat-redo:before {
+  content: "2";
+}
+.ushc-paper-icon-plus-circle:before {
+  content: "3";
+}
+.ushc-paper-icon-plus:before {
+  content: "4";
+}
+.ushc-paper-icon-like:before {
+  content: "5";
+}
+.ushc-paper-icon-hand-down:before {
+  content: "6";
+}
+.ushc-paper-icon-hand-right:before {
+  content: "7";
+}
+.ushc-paper-icon-hand-up:before {
+  content: "8";
+}
+.ushc-paper-icon-location-arrow:before {
+  content: "9";
+}
+.ushc-paper-icon-remove:before {
+  content: "!";
+}
+.ushc-paper-icon-tags:before {
+  content: "\"";
+}
+.ushc-paper-icon-tag-2:before {
+  content: "#";
+}
+.ushc-paper-icon-tachometer:before {
+  content: "$";
+}
+.ushc-paper-icon-trash-bin:before {
+  content: "%";
+}
+.ushc-paper-icon-truck:before {
+  content: "&";
+}
+.ushc-paper-icon-unlock-2:before {
+  content: "'";
+}
+.ushc-paper-icon-unlock:before {
+  content: "(";
+}
+.ushc-paper-icon-volume-down:before {
+  content: ")";
+}
+.ushc-paper-icon-volume-down-1:before {
+  content: "*";
+}
+.ushc-paper-icon-volume-up:before {
+  content: "+";
+}
+.ushc-paper-icon-windows:before {
+  content: ",";
+}
+.ushc-paper-icon-thumbnails-large:before {
+  content: "-";
+}
+.ushc-paper-icon-thumbnails:before {
+  content: ".";
+}
+.ushc-paper-icon-table:before {
+  content: "/";
+}
+.ushc-paper-icon-tablet:before {
+  content: ":";
+}
+.ushc-paper-icon-smile:before {
+  content: ";";
+}
+.ushc-paper-icon-github:before {
+  content: "<";
+}
+.ushc-paper-icon-delete-circle:before {
+  content: "=";
+}
+.ushc-paper-icon-chevron-left:before {
+  content: ">";
+}
+.ushc-paper-icon-chevron-right:before {
+  content: "?";
+}
+.ushc-paper-icon-chevron-up:before {
+  content: "@";
+}
+.ushc-paper-icon-search-find:before {
+  content: "[";
+}
+.ushc-paper-icon-archive:before {
+  content: "]";
+}
+.ushc-paper-icon-box-inbox:before {
+  content: "^";
+}
+.ushc-paper-icon-globe-world:before {
+  content: "_";
+}
