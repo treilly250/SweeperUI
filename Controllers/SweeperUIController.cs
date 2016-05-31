@@ -93,44 +93,7 @@ namespace SweeperUI.Controllers
                 JsonRequestBehavior.AllowGet);
         }
 
-        public async Task<ActionResult> GetClaimCostsResults(string startDate, string endDate, string lowerBoundClaimAmount, string upperBoundClaimAmount)
-        {
-            var con = new Sweeper_DAL.SweeperUIEntitiesQA();
-
-            var manager = ClaimsManager;
-
-            var master = manager.checkAccess(new string[] { UMSClaims.CLAIM_DEV, UMSClaims.CLAIM_USHC_ADMIN, UMSClaims.CLAIM_MASTER });
-
-            DateTime startDateTime = GetDateFromString(startDate, new DateTime(2000, 1, 1));
-            DateTime endDateTime = GetDateFromString(endDate, DateTime.Now);
-            decimal lowerBoundClaimAmountAsDecimal = GetClaimAmountFromString(lowerBoundClaimAmount, 0);
-            decimal upperBoundClaimAmountAsDecimal = GetClaimAmountFromString(upperBoundClaimAmount, 99999999);
-
-            var cm = (from clm in con.MC_Claim
-                      join pat in con.MC_Patient on clm.ClaimID equals pat.ClaimID
-                      join svc in con.MC_Service on clm.ClaimID equals svc.ClaimID
-                      join cpt in con.MC_CPTCodes on svc.ProcedureCode equals cpt.CPTCode into oj
-                      from cptOuter in oj.DefaultIfEmpty()
-                      where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
-                      orderby svc.Date, clm.ClaimNumber, pat.NameLastName, pat.NameFirstName, pat.NameMiddleName ascending
-                      select new { svc.Date, clm.ClaimNumber, pat.NameLastName, pat.NameFirstName, pat.NameMiddleName, pat.DateOfBirth, svc.ChargeAmount, cptOuter.CPTCode, cptOuter.Description });
-
-            var result = cm.ToList().Select(l => new
-            {
-                StatementDate = l.Date == null ? "" : ((DateTime)l.Date).ToString("yyyy-MM-dd"),
-                ClaimNumber = l.ClaimNumber,
-                FullName = l.NameLastName + (string.IsNullOrEmpty(l.NameFirstName) ? "" : (", " + l.NameFirstName)) + (string.IsNullOrEmpty(l.NameMiddleName) ? "" : (" " + l.NameMiddleName)),
-                DateOfBirth = l.DateOfBirth == null ? "" : l.DateOfBirth.Value.ToString("yyyy-MM-dd"),
-                TotalClaim = l.ChargeAmount.ToString("C"),
-                TotalClaimRaw = l.ChargeAmount,
-                CPTCode = l.CPTCode,
-                CPTDescription = l.Description
-            });
-
-            return Json(result, "Claims", JsonRequestBehavior.AllowGet);
-        }
-
-        public async Task<ActionResult> GetDiagnosesICDResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundClaimAmount, string upperBoundClaimAmount)
+        public async Task<ActionResult> GetDiagnosesICDResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber)
         {
             var con = new Sweeper_DAL.SweeperUIEntitiesQA();
 
@@ -148,6 +111,16 @@ namespace SweeperUI.Controllers
                 upperBoundICD = "999999";
             }
 
+            if (string.IsNullOrWhiteSpace(lowerBoundCPT))
+            {
+                lowerBoundCPT = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundCPT))
+            {
+                upperBoundCPT = "999999";
+            }
+
             DateTime startDateTime = GetDateFromString(startDate, new DateTime(2000, 1, 1));
             DateTime endDateTime = GetDateFromString(endDate, DateTime.Now);
             decimal lowerBoundClaimAmountAsDecimal = GetClaimAmountFromString(lowerBoundClaimAmount, 0);
@@ -156,8 +129,13 @@ namespace SweeperUI.Controllers
             var cmClaims = (from d in con.MC_Diagnosis
                             join icd9 in con.MC_ICD9 on d.CodeNoDot equals icd9.Code
                             join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
+                            join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
+                            join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
                             where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
                                   && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                  && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                  && (claimantID == "" || claimantID == pat.MemberId)
+                                  && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                             group new { d, svc } by new { d.Code, icd9.DescriptionLong, icd9.DescriptionShort } into g
                             select new
                             {
@@ -173,9 +151,13 @@ namespace SweeperUI.Controllers
             var cmEvents = (from d in con.MC_Diagnosis
                             join icd9 in con.MC_ICD9 on d.CodeNoDot equals icd9.Code
                             join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
-                            join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                            join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
+                            join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
                             where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
                                   && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                  && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                  && (claimantID == "" || claimantID == pat.MemberId)
+                                  && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                             group new { d, clm } by new { d.Code } into g
                             select new
                             {
@@ -184,30 +166,50 @@ namespace SweeperUI.Controllers
                             });
 
             var cmClaimants = (from d in con.MC_Diagnosis
-                              join icd9 in con.MC_ICD9 on d.CodeNoDot equals icd9.Code
-                              join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
-                              join pat in con.MC_Patient on clm.ClaimID equals pat.ClaimID
-                              group new { d, pat } by new { d.Code } into g
-                              select new {
-                                  ICDCode = g.Key.Code,
-                                  ClaimantCount = g.Select(x => x.pat.MemberId).Distinct().Count()
-                              });
+                               join icd9 in con.MC_ICD9 on d.CodeNoDot equals icd9.Code
+                               join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
+                               join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on clm.ClaimID equals pat.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                               group new { d, pat } by new { d.Code } into g
+                               select new {
+                                   ICDCode = g.Key.Code,
+                                   ClaimantCount = g.Select(x => x.pat.MemberId).Distinct().Count()
+                               });
 
             var cmEmployees = (from d in con.MC_Diagnosis
-                              join icd9 in con.MC_ICD9 on d.CodeNoDot equals icd9.Code
-                              join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
-                              join sub in con.MC_Subscriber on clm.ClaimID equals sub.ClaimID
-                              group new { d, sub } by new { d.Code } into g
-                              select new
-                              {
-                                  ICDCode = g.Key.Code,
-                                  EmployeeCount = g.Select(x => x.sub.MemberId).Distinct().Count()
-                              });
+                               join icd9 in con.MC_ICD9 on d.CodeNoDot equals icd9.Code
+                               join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
+                               join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
+                               join sub in con.MC_Subscriber on clm.ClaimID equals sub.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                               group new { d, sub } by new { d.Code } into g
+                               select new
+                               {
+                                   ICDCode = g.Key.Code,
+                                   EmployeeCount = g.Select(x => x.sub.MemberId).Distinct().Count()
+                               });
 
             var cmProviders = (from d in con.MC_Diagnosis
                                join icd9 in con.MC_ICD9 on d.CodeNoDot equals icd9.Code
+                               join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
                                join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
                                join prv in con.MC_Provider on d.ClaimID equals prv.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                                group new { d, prv } by new { d.Code } into g
                                select new
                                {
@@ -258,7 +260,7 @@ namespace SweeperUI.Controllers
             return Json(result, "Diagnoses by ICD", JsonRequestBehavior.AllowGet);
         }
 
-        public async Task<ActionResult> GetDiagnosesICDClaimsResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundClaimAmount, string upperBoundClaimAmount)
+        public async Task<ActionResult> GetClaimantsResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber)
         {
             var con = new Sweeper_DAL.SweeperUIEntitiesQA();
 
@@ -274,6 +276,125 @@ namespace SweeperUI.Controllers
             if (string.IsNullOrWhiteSpace(upperBoundICD))
             {
                 upperBoundICD = "999999";
+            }
+
+            if (string.IsNullOrWhiteSpace(lowerBoundCPT))
+            {
+                lowerBoundCPT = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundCPT))
+            {
+                upperBoundCPT = "999999";
+            }
+
+            DateTime startDateTime = GetDateFromString(startDate, new DateTime(2000, 1, 1));
+            DateTime endDateTime = GetDateFromString(endDate, DateTime.Now);
+            decimal lowerBoundClaimAmountAsDecimal = GetClaimAmountFromString(lowerBoundClaimAmount, 0);
+            decimal upperBoundClaimAmountAsDecimal = GetClaimAmountFromString(upperBoundClaimAmount, 99999999);
+
+            var cmClaims = (from d in con.MC_Diagnosis
+                            join icd9 in con.MC_ICD9 on d.CodeNoDot equals icd9.Code
+                            join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
+                            join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
+                            join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                            where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                  && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                  && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                  && (claimantID == "" || claimantID == pat.MemberId)
+                                  && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                            group new { pat, svc } by new { pat.NameLastName, pat.NameFirstName, pat.NameMiddleName, pat.DateOfBirth, pat.MemberId, pat.RelationshipDescription } into g
+                            select new
+                            {
+                                FullName = g.Key.NameLastName + (string.IsNullOrEmpty(g.Key.NameFirstName) ? "" : (", " + g.Key.NameFirstName)) + (string.IsNullOrEmpty(g.Key.NameMiddleName) ? "" : (" " + g.Key.NameMiddleName)),
+                                g.Key.DateOfBirth,
+                                g.Key.MemberId,
+                                g.Key.RelationshipDescription,
+                                ClaimCount = g.Count(),
+                                ClaimTotalRaw = g.Sum(i => i.svc.ChargeAmount),
+                                ClaimMaximumRaw = g.Max(i => i.svc.ChargeAmount),
+                                ClaimAverageRaw = g.Average(i => i.svc.ChargeAmount)
+                            }).Take(500);
+
+            var cmEvents = (from d in con.MC_Diagnosis
+                            join icd9 in con.MC_ICD9 on d.CodeNoDot equals icd9.Code
+                            join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
+                            join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
+                            join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                            where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                  && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                  && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                  && (claimantID == "" || claimantID == pat.MemberId)
+                                  && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                            group new { pat, clm } by new { pat.NameLastName, pat.NameFirstName, pat.NameMiddleName, pat.DateOfBirth, pat.MemberId, pat.PlanNumber, pat.GroupNumber } into g
+                            select new
+                            {
+                                FullName = g.Key.NameLastName + (string.IsNullOrEmpty(g.Key.NameFirstName) ? "" : (", " + g.Key.NameFirstName)) + (string.IsNullOrEmpty(g.Key.NameMiddleName) ? "" : (" " + g.Key.NameMiddleName)),
+                                g.Key.DateOfBirth,
+                                g.Key.MemberId,
+                                EventCount = g.Select(i => i.clm.ClaimID).Distinct().Count()
+                            }).Take(500);
+
+            var cm = (from clm in cmClaims
+                      join evt in cmEvents on new { clm.FullName, clm.DateOfBirth, clm.MemberId } equals new { evt.FullName, evt.DateOfBirth, evt.MemberId }
+                      select new
+                      {
+                          clm.FullName,
+                          clm.DateOfBirth,
+                          clm.MemberId,
+                          clm.RelationshipDescription,
+                          evt.EventCount,
+                          clm.ClaimCount,
+                          clm.ClaimTotalRaw,
+                          clm.ClaimMaximumRaw,
+                          clm.ClaimAverageRaw
+                      });
+
+            var result = cm.ToList().Select(l => new
+            {
+                l.FullName,
+                l.DateOfBirth,
+                l.MemberId,
+                l.RelationshipDescription,
+                l.EventCount,
+                l.ClaimCount,
+                ClaimTotal = l.ClaimTotalRaw.ToString("C"),
+                l.ClaimTotalRaw,
+                ClaimMaximum = l.ClaimMaximumRaw.ToString("C"),
+                l.ClaimMaximumRaw,
+                ClaimAverage = l.ClaimAverageRaw.ToString("C"),
+                l.ClaimAverageRaw
+            });
+
+            return Json(result, "Claimants", JsonRequestBehavior.AllowGet);
+        }
+
+        public async Task<ActionResult> GetDiagnosesICDEventsResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber)
+        {
+            var con = new Sweeper_DAL.SweeperUIEntitiesQA();
+
+            var manager = ClaimsManager;
+
+            var master = manager.checkAccess(new string[] { UMSClaims.CLAIM_DEV, UMSClaims.CLAIM_USHC_ADMIN, UMSClaims.CLAIM_MASTER });
+
+            if (string.IsNullOrWhiteSpace(lowerBoundICD))
+            {
+                lowerBoundICD = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundICD))
+            {
+                upperBoundICD = "999999";
+            }
+
+            if (string.IsNullOrWhiteSpace(lowerBoundCPT))
+            {
+                lowerBoundCPT = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundCPT))
+            {
+                upperBoundCPT = "999999";
             }
 
             DateTime startDateTime = GetDateFromString(startDate, new DateTime(2000, 1, 1));
@@ -286,29 +407,39 @@ namespace SweeperUI.Controllers
                       join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
                       join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
                       join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
-                      join cpt in con.MC_CPTCodes on svc.ProcedureCode equals cpt.CPTCode into oj
-                      from cptOuter in oj.DefaultIfEmpty()
                       where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
                             && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
-                      orderby svc.Date, clm.ClaimNumber, pat.NameLastName, pat.NameFirstName, pat.NameMiddleName ascending
-                      select new { svc.Date, clm.ClaimNumber, pat.NameLastName, pat.NameFirstName, pat.NameMiddleName, pat.DateOfBirth, svc.ChargeAmount, cptOuter.CPTCode, cptOuter.Description });
+                            && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                            && (claimantID == "" || claimantID == pat.MemberId)
+                            && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                      group new { pat, clm } by new { pat.MemberId, pat.NameLastName, pat.NameFirstName, pat.NameMiddleName, clm.SerializableStatementFromDate, clm.ClaimNumber, clm.TotalClaimChargeAmount } into g
+                      select new
+                      {
+                          g.Key.MemberId,
+                          g.Key.NameLastName,
+                          g.Key.NameFirstName,
+                          g.Key.NameMiddleName,
+                          g.Key.SerializableStatementFromDate,
+                          g.Key.ClaimNumber,
+                          g.Key.TotalClaimChargeAmount,
+                          ClaimCount = g.Count()
+                      }).Take(5000);
 
             var result = cm.ToList().Select(l => new
             {
-                StatementDate = l.Date == null ? "" : ((DateTime)l.Date).ToString("yyyy-MM-dd"),
-                ClaimNumber = l.ClaimNumber,
+                l.MemberId,
                 FullName = l.NameLastName + (string.IsNullOrEmpty(l.NameFirstName) ? "" : (", " + l.NameFirstName)) + (string.IsNullOrEmpty(l.NameMiddleName) ? "" : (" " + l.NameMiddleName)),
-                DateOfBirth = l.DateOfBirth == null ? "" : l.DateOfBirth.Value.ToString("yyyy-MM-dd"),
-                TotalClaim = l.ChargeAmount.ToString("C"),
-                TotalClaimRaw = l.ChargeAmount,
-                CPTCode = l.CPTCode,
-                CPTDescription = l.Description
+                StatementDate = l.SerializableStatementFromDate == null ? "" : ((DateTime)l.SerializableStatementFromDate).ToString("yyyy-MM-dd"),
+                ClaimNumber = l.ClaimNumber,
+                l.ClaimCount,
+                EventTotal = l.TotalClaimChargeAmount.ToString("C"),
+                EventTotalRaw = l.TotalClaimChargeAmount
             });
 
-            return Json(result, "Diagnoses by ICD Claims", JsonRequestBehavior.AllowGet);
+            return Json(result, "Diagnoses by ICD Events", JsonRequestBehavior.AllowGet);
         }
 
-        public async Task<ActionResult> GetDiagnosesGroupResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundClaimAmount, string upperBoundClaimAmount)
+        public async Task<ActionResult> GetClaimsResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber)
         {
             var con = new Sweeper_DAL.SweeperUIEntitiesQA();
 
@@ -326,6 +457,95 @@ namespace SweeperUI.Controllers
                 upperBoundICD = "999999";
             }
 
+            if (string.IsNullOrWhiteSpace(lowerBoundCPT))
+            {
+                lowerBoundCPT = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundCPT))
+            {
+                upperBoundCPT = "999999";
+            }
+
+            DateTime startDateTime = GetDateFromString(startDate, new DateTime(2000, 1, 1));
+            DateTime endDateTime = GetDateFromString(endDate, DateTime.Now);
+            decimal lowerBoundClaimAmountAsDecimal = GetClaimAmountFromString(lowerBoundClaimAmount, 0);
+            decimal upperBoundClaimAmountAsDecimal = GetClaimAmountFromString(upperBoundClaimAmount, 99999999);
+
+            var cm = (from d in con.MC_Diagnosis
+                      join icd9 in con.MC_ICD9 on d.CodeNoDot equals icd9.Code
+                      join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
+                      join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                      join prv in con.MC_Provider on clm.ClaimID equals prv.ClaimID
+                      join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
+                      join cpt in con.MC_CPTCodes on svc.ProcedureCode equals cpt.CPTCode into oj
+                      from cptOuter in oj.DefaultIfEmpty()
+                      where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                            && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                            && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                            && (claimantID == "" || claimantID == pat.MemberId)
+                            && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                      orderby svc.Date, clm.ClaimNumber, pat.NameLastName, pat.NameFirstName, pat.NameMiddleName ascending
+                      select new
+                      {
+                          svc.Date,
+                          pat.MemberId,
+                          pat.NameLastName,
+                          pat.NameFirstName,
+                          pat.NameMiddleName,
+                          clm.ClaimNumber,
+                          ProviderName = prv.NameLastName + (string.IsNullOrEmpty(prv.NameFirstName) ? "" : (", " + prv.NameFirstName)) + (string.IsNullOrEmpty(prv.NameMiddleName) ? "" : (" " + prv.NameMiddleName)),
+                          pat.DateOfBirth,
+                          svc.ChargeAmount,
+                          cptOuter.CPTCode,
+                          cptOuter.Description
+                      }).Take(500);
+
+            var result = cm.ToList().Select(l => new
+            {
+                StatementDate = l.Date == null ? "" : ((DateTime)l.Date).ToString("yyyy-MM-dd"),
+                l.MemberId,
+                ClaimNumber = l.ClaimNumber,
+                l.ProviderName,
+                FullName = l.NameLastName + (string.IsNullOrEmpty(l.NameFirstName) ? "" : (", " + l.NameFirstName)) + (string.IsNullOrEmpty(l.NameMiddleName) ? "" : (" " + l.NameMiddleName)),
+                DateOfBirth = l.DateOfBirth == null ? "" : l.DateOfBirth.Value.ToString("yyyy-MM-dd"),
+                PaidAmount = l.ChargeAmount.ToString("C"),
+                PaidAmountRaw = l.ChargeAmount,
+                CPTCode = l.CPTCode,
+                CPTDescription = l.Description
+            });
+
+            return Json(result, "Claims", JsonRequestBehavior.AllowGet);
+        }
+
+        public async Task<ActionResult> GetDiagnosesGroupResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber)
+        {
+            var con = new Sweeper_DAL.SweeperUIEntitiesQA();
+
+            var manager = ClaimsManager;
+
+            var master = manager.checkAccess(new string[] { UMSClaims.CLAIM_DEV, UMSClaims.CLAIM_USHC_ADMIN, UMSClaims.CLAIM_MASTER });
+
+            if (string.IsNullOrWhiteSpace(lowerBoundICD))
+            {
+                lowerBoundICD = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundICD))
+            {
+                upperBoundICD = "999999";
+            }
+
+            if (string.IsNullOrWhiteSpace(lowerBoundCPT))
+            {
+                lowerBoundCPT = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundCPT))
+            {
+                upperBoundCPT = "999999";
+            }
+
             DateTime startDateTime = GetDateFromString(startDate, new DateTime(2000, 1, 1));
             DateTime endDateTime = GetDateFromString(endDate, DateTime.Now);
             decimal lowerBoundClaimAmountAsDecimal = GetClaimAmountFromString(lowerBoundClaimAmount, 0);
@@ -334,8 +554,13 @@ namespace SweeperUI.Controllers
             var cmClaims = (from d in con.MC_Diagnosis
                             join dg in con.MC_DiagnosticGroups on d.GroupId.Value equals dg.GroupId
                             join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
+                            join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
+                            join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
                             where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
                                   && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                  && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                  && (claimantID == "" || claimantID == pat.MemberId)
+                                  && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                             group new { dg, svc } by new { dg.GroupId, dg.GroupName } into g
                             select new
                             {
@@ -351,8 +576,12 @@ namespace SweeperUI.Controllers
                             join dg in con.MC_DiagnosticGroups on d.GroupId.Value equals dg.GroupId
                             join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
                             join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                            join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
                             where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
                                   && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                  && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                  && (claimantID == "" || claimantID == pat.MemberId)
+                                  && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                             group new { d, clm } by new { dg.GroupId } into g
                             select new
                             {
@@ -361,31 +590,51 @@ namespace SweeperUI.Controllers
                             });
 
             var cmClaimants = (from d in con.MC_Diagnosis
-                              join dg in con.MC_DiagnosticGroups on d.GroupId.Value equals dg.GroupId
-                              join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
-                              join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
-                              group new { dg, pat } by new { dg.GroupId } into g
-                              select new
-                              {
-                                  g.Key.GroupId,
-                                  ClaimantCount = g.Select(x => x.pat.MemberId).Distinct().Count()
-                              });
+                               join dg in con.MC_DiagnosticGroups on d.GroupId.Value equals dg.GroupId
+                               join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
+                               join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                               group new { dg, pat } by new { dg.GroupId } into g
+                               select new
+                               {
+                                   g.Key.GroupId,
+                                   ClaimantCount = g.Select(x => x.pat.MemberId).Distinct().Count()
+                               });
 
             var cmEmployees = (from d in con.MC_Diagnosis
-                              join dg in con.MC_DiagnosticGroups on d.GroupId.Value equals dg.GroupId
-                              join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
-                              join sub in con.MC_Subscriber on d.ClaimID equals sub.ClaimID
-                              group new { dg, sub } by new { dg.GroupId } into g
-                              select new
-                              {
-                                  g.Key.GroupId,
-                                  EmployeeCount = g.Select(x => x.sub.MemberId).Distinct().Count()
-                              });
+                               join dg in con.MC_DiagnosticGroups on d.GroupId.Value equals dg.GroupId
+                               join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
+                               join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
+                               join sub in con.MC_Subscriber on d.ClaimID equals sub.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                               group new { dg, sub } by new { dg.GroupId } into g
+                               select new
+                               {
+                                   g.Key.GroupId,
+                                   EmployeeCount = g.Select(x => x.sub.MemberId).Distinct().Count()
+                               });
 
             var cmProviders = (from d in con.MC_Diagnosis
                                join dg in con.MC_DiagnosticGroups on d.GroupId.Value equals dg.GroupId
+                               join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
                                join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
                                join prv in con.MC_Provider on d.ClaimID equals prv.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                                group new { dg, prv } by new { dg.GroupId } into g
                                select new
                                {
@@ -433,7 +682,7 @@ namespace SweeperUI.Controllers
             return Json(result, "Diagnoses by Group", JsonRequestBehavior.AllowGet);
         }
 
-        public async Task<ActionResult> GetDiagnosesSubgroupResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundClaimAmount, string upperBoundClaimAmount)
+        public async Task<ActionResult> GetDiagnosesSubgroupResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber)
         {
             var con = new Sweeper_DAL.SweeperUIEntitiesQA();
 
@@ -451,6 +700,16 @@ namespace SweeperUI.Controllers
                 upperBoundICD = "999999";
             }
 
+            if (string.IsNullOrWhiteSpace(lowerBoundCPT))
+            {
+                lowerBoundCPT = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundCPT))
+            {
+                upperBoundCPT = "999999";
+            }
+
             DateTime startDateTime = GetDateFromString(startDate, new DateTime(2000, 1, 1));
             DateTime endDateTime = GetDateFromString(endDate, DateTime.Now);
             decimal lowerBoundClaimAmountAsDecimal = GetClaimAmountFromString(lowerBoundClaimAmount, 0);
@@ -459,8 +718,13 @@ namespace SweeperUI.Controllers
             var cmClaims = (from d in con.MC_Diagnosis
                             join dsg in con.MC_DiagnosticSubgroups on d.SubgroupId.Value equals dsg.SubgroupId
                             join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
+                            join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
+                            join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
                             where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
                                   && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                  && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                  && (claimantID == "" || claimantID == pat.MemberId)
+                                  && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                             group new { dsg, svc } by new { dsg.SubgroupId, dsg.SubgroupName } into g
                             select new
                             {
@@ -476,8 +740,12 @@ namespace SweeperUI.Controllers
                             join dsg in con.MC_DiagnosticSubgroups on d.SubgroupId.Value equals dsg.SubgroupId
                             join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
                             join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                            join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
                             where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
                                   && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                  && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                  && (claimantID == "" || claimantID == pat.MemberId)
+                                  && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                             group new { d, clm } by new { dsg.SubgroupId } into g
                             select new
                             {
@@ -486,31 +754,51 @@ namespace SweeperUI.Controllers
                             });
 
             var cmClaimants = (from d in con.MC_Diagnosis
-                              join dsg in con.MC_DiagnosticSubgroups on d.SubgroupId.Value equals dsg.SubgroupId
-                              join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
-                              join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
-                              group new { dsg, pat } by new { dsg.SubgroupId, dsg.SubgroupName } into g
-                              select new
-                              {
-                                  g.Key.SubgroupId,
-                                  ClaimantCount = g.Select(x => x.pat.MemberId).Distinct().Count()
-                              });
+                               join dsg in con.MC_DiagnosticSubgroups on d.SubgroupId.Value equals dsg.SubgroupId
+                               join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
+                               join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                               group new { dsg, pat } by new { dsg.SubgroupId, dsg.SubgroupName } into g
+                               select new
+                               {
+                                   g.Key.SubgroupId,
+                                   ClaimantCount = g.Select(x => x.pat.MemberId).Distinct().Count()
+                               });
 
             var cmEmployees = (from d in con.MC_Diagnosis
-                              join dsg in con.MC_DiagnosticSubgroups on d.SubgroupId.Value equals dsg.SubgroupId
-                              join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
-                              join sub in con.MC_Subscriber on d.ClaimID equals sub.ClaimID
-                              group new { dsg, sub } by new { dsg.SubgroupId, dsg.SubgroupName } into g
-                              select new
-                              {
-                                  g.Key.SubgroupId,
-                                  EmployeeCount = g.Select(x => x.sub.MemberId).Distinct().Count()
-                              });
+                               join dsg in con.MC_DiagnosticSubgroups on d.SubgroupId.Value equals dsg.SubgroupId
+                               join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
+                               join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
+                               join sub in con.MC_Subscriber on d.ClaimID equals sub.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                               group new { dsg, sub } by new { dsg.SubgroupId, dsg.SubgroupName } into g
+                               select new
+                               {
+                                   g.Key.SubgroupId,
+                                   EmployeeCount = g.Select(x => x.sub.MemberId).Distinct().Count()
+                               });
 
             var cmProviders = (from d in con.MC_Diagnosis
                                join dsg in con.MC_DiagnosticSubgroups on d.SubgroupId.Value equals dsg.SubgroupId
+                               join svc in con.MC_Service on d.ClaimID equals svc.ClaimID
                                join clm in con.MC_Claim on d.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on d.ClaimID equals pat.ClaimID
                                join prv in con.MC_Provider on d.ClaimID equals prv.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(d.Code, lowerBoundICD) != -1 && string.Compare(d.Code, upperBoundICD) != 1
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                                group new { dsg, prv } by new { dsg.SubgroupId, dsg.SubgroupName } into g
                                select new
                                {
@@ -559,7 +847,7 @@ namespace SweeperUI.Controllers
             return Json(result, "Diagnoses by Subgroup", JsonRequestBehavior.AllowGet);
         }
 
-        public async Task<ActionResult> GetProvidersResults(string startDate, string endDate, string providerNPI, string lowerBoundClaimAmount, string upperBoundClaimAmount)
+        public async Task<ActionResult> GetProvidersResults(string startDate, string endDate, string lowerBoundClaimAmount, string upperBoundClaimAmount, string providerNPI)
         {
             var con = new Sweeper_DAL.SweeperUIEntitiesQA();
 
@@ -572,137 +860,71 @@ namespace SweeperUI.Controllers
             decimal lowerBoundClaimAmountAsDecimal = GetClaimAmountFromString(lowerBoundClaimAmount, 0);
             decimal upperBoundClaimAmountAsDecimal = GetClaimAmountFromString(upperBoundClaimAmount, 99999999);
 
-            if (string.IsNullOrWhiteSpace(providerNPI))
+            var cmClaims = (from prv in con.MC_Provider
+                            join svc in con.MC_Service on prv.ClaimID equals svc.ClaimID
+                            where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                  && (providerNPI == "" || providerNPI == prv.Npi)
+                            group new { prv, svc } by new { prv.NameLastName, prv.NameFirstName, prv.NameMiddleName, prv.Npi } into g
+                            select new
+                            {
+                                g.Key.NameLastName,
+                                g.Key.NameFirstName,
+                                g.Key.NameMiddleName,
+                                g.Key.Npi,
+                                ClaimCount = g.Count(),
+                                ClaimTotalRaw = g.Sum(i => i.svc.ChargeAmount),
+                                ClaimMaximumRaw = g.Max(i => i.svc.ChargeAmount),
+                                ClaimAverageRaw = g.Average(i => i.svc.ChargeAmount)
+                            });
+
+            var cmEvents = (from prv in con.MC_Provider
+                            join svc in con.MC_Service on prv.ClaimID equals svc.ClaimID
+                            join clm in con.MC_Claim on prv.ClaimID equals clm.ClaimID
+                            where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                  && (providerNPI == "" || providerNPI == prv.Npi)
+                            group new { prv, clm } by new { prv.NameLastName, prv.NameFirstName, prv.NameMiddleName, prv.Npi } into g
+                            select new
+                            {
+                                g.Key.NameLastName,
+                                g.Key.NameFirstName,
+                                g.Key.NameMiddleName,
+                                g.Key.Npi,
+                                EventCount = g.Select(i => i.clm.ClaimID).Distinct().Count()
+                            });
+
+            var cm = (from clm in cmClaims
+                      join evt in cmEvents on clm.Npi equals evt.Npi
+                      select new
+                      {
+                          clm.NameLastName,
+                          clm.NameFirstName,
+                          clm.NameMiddleName,
+                          clm.Npi,
+                          evt.EventCount,
+                          clm.ClaimCount,
+                          clm.ClaimTotalRaw,
+                          clm.ClaimMaximumRaw,
+                          clm.ClaimAverageRaw
+                      });
+
+            var result = cm.ToList().Select(l => new
             {
-                var cmClaims = (from prv in con.MC_Provider
-                                join svc in con.MC_Service on prv.ClaimID equals svc.ClaimID
-                                where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
-                                group new { prv, svc } by new { prv.NameLastName, prv.NameFirstName, prv.NameMiddleName, prv.Npi } into g
-                                select new
-                                {
-                                    g.Key.NameLastName,
-                                    g.Key.NameFirstName,
-                                    g.Key.NameMiddleName,
-                                    g.Key.Npi,
-                                    ClaimCount = g.Count(),
-                                    ClaimTotalRaw = g.Sum(i => i.svc.ChargeAmount),
-                                    ClaimMaximumRaw = g.Max(i => i.svc.ChargeAmount),
-                                    ClaimAverageRaw = g.Average(i => i.svc.ChargeAmount)
-                                });
+                FullName = l.NameLastName + (string.IsNullOrEmpty(l.NameFirstName) ? "" : (", " + l.NameFirstName)) + (string.IsNullOrEmpty(l.NameMiddleName) ? "" : (" " + l.NameMiddleName)),
+                l.Npi,
+                l.EventCount,
+                l.ClaimCount,
+                ClaimTotal = l.ClaimTotalRaw.ToString("C"),
+                l.ClaimTotalRaw,
+                ClaimMaximum = l.ClaimMaximumRaw.ToString("C"),
+                l.ClaimMaximumRaw,
+                ClaimAverage = l.ClaimAverageRaw.ToString("C"),
+                l.ClaimAverageRaw
+            });
 
-                var cmEvents = (from prv in con.MC_Provider
-                                join svc in con.MC_Service on prv.ClaimID equals svc.ClaimID
-                                join clm in con.MC_Claim on prv.ClaimID equals clm.ClaimID
-                                where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
-                                group new { prv, clm } by new { prv.NameLastName, prv.NameFirstName, prv.NameMiddleName, prv.Npi } into g
-                                select new
-                                {
-                                    g.Key.NameLastName,
-                                    g.Key.NameFirstName,
-                                    g.Key.NameMiddleName,
-                                    g.Key.Npi,
-                                    EventCount = g.Select(i => i.clm.ClaimID).Distinct().Count()
-                                });
-
-                var cm = (from clm in cmClaims
-                          join evt in cmEvents on clm.Npi equals evt.Npi
-                          select new
-                          {
-                              clm.NameLastName,
-                              clm.NameFirstName,
-                              clm.NameMiddleName,
-                              clm.Npi,
-                              evt.EventCount,
-                              clm.ClaimCount,
-                              clm.ClaimTotalRaw,
-                              clm.ClaimMaximumRaw,
-                              clm.ClaimAverageRaw
-                          });
-
-                var result = cm.ToList().Select(l => new
-                {
-                    FullName = l.NameLastName + (string.IsNullOrEmpty(l.NameFirstName) ? "" : (", " + l.NameFirstName)) + (string.IsNullOrEmpty(l.NameMiddleName) ? "" : (" " + l.NameMiddleName)),
-                    l.Npi,
-                    l.EventCount,
-                    l.ClaimCount,
-                    ClaimTotal = l.ClaimTotalRaw.ToString("C"),
-                    l.ClaimTotalRaw,
-                    ClaimMaximum = l.ClaimMaximumRaw.ToString("C"),
-                    l.ClaimMaximumRaw,
-                    ClaimAverage = l.ClaimAverageRaw.ToString("C"),
-                    l.ClaimAverageRaw
-                });
-
-                return Json(result, "Providers", JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                var cmClaims = (from prv in con.MC_Provider
-                                join svc in con.MC_Service on prv.ClaimID equals svc.ClaimID
-                                where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
-                                    && prv.Npi == providerNPI
-                                group new { prv, svc } by new { prv.NameLastName, prv.NameFirstName, prv.NameMiddleName, prv.Npi } into g
-                                select new
-                                {
-                                    g.Key.NameLastName,
-                                    g.Key.NameFirstName,
-                                    g.Key.NameMiddleName,
-                                    g.Key.Npi,
-                                    ClaimCount = g.Count(),
-                                    ClaimTotalRaw = g.Sum(i => i.svc.ChargeAmount),
-                                    ClaimMaximumRaw = g.Max(i => i.svc.ChargeAmount),
-                                    ClaimAverageRaw = g.Average(i => i.svc.ChargeAmount)
-                                });
-
-                var cmEvents = (from prv in con.MC_Provider
-                                join svc in con.MC_Service on prv.ClaimID equals svc.ClaimID
-                                join clm in con.MC_Claim on prv.ClaimID equals clm.ClaimID
-                                where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
-                                    && prv.Npi == providerNPI
-                                group new { prv, clm } by new { prv.NameLastName, prv.NameFirstName, prv.NameMiddleName, prv.Npi } into g
-                                select new
-                                {
-                                    g.Key.NameLastName,
-                                    g.Key.NameFirstName,
-                                    g.Key.NameMiddleName,
-                                    g.Key.Npi,
-                                    EventCount = g.Select(i => i.clm.ClaimID).Distinct().Count()
-                                });
-
-                var cm = (from clm in cmClaims
-                          join evt in cmEvents on clm.Npi equals evt.Npi
-                          select new
-                          {
-                              clm.NameLastName,
-                              clm.NameFirstName,
-                              clm.NameMiddleName,
-                              clm.Npi,
-                              evt.EventCount,
-                              clm.ClaimCount,
-                              clm.ClaimTotalRaw,
-                              clm.ClaimMaximumRaw,
-                              clm.ClaimAverageRaw
-                          });
-
-                var result = cm.ToList().Select(l => new
-                {
-                    FullName = l.NameLastName + (string.IsNullOrEmpty(l.NameFirstName) ? "" : (", " + l.NameFirstName)) + (string.IsNullOrEmpty(l.NameMiddleName) ? "" : (" " + l.NameMiddleName)),
-                    l.Npi,
-                    l.EventCount,
-                    l.ClaimCount,
-                    ClaimTotal = l.ClaimTotalRaw.ToString("C"),
-                    l.ClaimTotalRaw,
-                    ClaimMaximum = l.ClaimMaximumRaw.ToString("C"),
-                    l.ClaimMaximumRaw,
-                    ClaimAverage = l.ClaimAverageRaw.ToString("C"),
-                    l.ClaimAverageRaw
-                });
-
-                return Json(result, "Providers", JsonRequestBehavior.AllowGet);
-            }
+            return Json(result, "Providers", JsonRequestBehavior.AllowGet);
         }
 
-        public async Task<ActionResult> GetProvidersClaimsResults(string startDate, string endDate, string providerNPI, string lowerBoundClaimAmount, string upperBoundClaimAmount)
+        public async Task<ActionResult> GetProvidersClaimsResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber, string providerNPI)
         {
             var con = new Sweeper_DAL.SweeperUIEntitiesQA();
 
@@ -715,211 +937,33 @@ namespace SweeperUI.Controllers
             decimal lowerBoundClaimAmountAsDecimal = GetClaimAmountFromString(lowerBoundClaimAmount, 0);
             decimal upperBoundClaimAmountAsDecimal = GetClaimAmountFromString(upperBoundClaimAmount, 99999999);
 
-            if (string.IsNullOrWhiteSpace(providerNPI))
+            var cm = (from prv in con.MC_Provider
+                      join svc in con.MC_Service on prv.ClaimID equals svc.ClaimID
+                      join cpt in con.MC_CPTCodes on svc.ProcedureCode equals cpt.CPTCode into oj
+                      from cptOuter in oj.DefaultIfEmpty()
+                      join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                      join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
+                      where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                              && (providerNPI == "" || providerNPI == prv.Npi)
+                      orderby svc.Date, clm.ClaimNumber, pat.NameLastName, pat.NameFirstName, pat.NameMiddleName ascending
+                      select new { svc.Date, clm.ClaimNumber, pat.NameLastName, pat.NameFirstName, pat.NameMiddleName, pat.DateOfBirth, svc.ChargeAmount, cptOuter.CPTCode, cptOuter.Description });
+
+            var result = cm.ToList().Select(l => new
             {
-                var cm = (from prv in con.MC_Provider
-                          join svc in con.MC_Service on prv.ClaimID equals svc.ClaimID
-                          join cpt in con.MC_CPTCodes on svc.ProcedureCode equals cpt.CPTCode into oj
-                          from cptOuter in oj.DefaultIfEmpty()
-                          join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
-                          join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
-                          where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
-                          orderby svc.Date, clm.ClaimNumber, pat.NameLastName, pat.NameFirstName, pat.NameMiddleName ascending
-                          select new { svc.Date, clm.ClaimNumber, pat.NameLastName, pat.NameFirstName, pat.NameMiddleName, pat.DateOfBirth, svc.ChargeAmount, cptOuter.CPTCode, cptOuter.Description });
-                var result = cm.ToList().Select(l => new
-                {
-                    StatementDate = l.Date == null ? "" : ((DateTime)l.Date).ToString("yyyy-MM-dd"),
-                    ClaimNumber = l.ClaimNumber,
-                    FullName = l.NameLastName + (string.IsNullOrEmpty(l.NameFirstName) ? "" : (", " + l.NameFirstName)) + (string.IsNullOrEmpty(l.NameMiddleName) ? "" : (" " + l.NameMiddleName)),
-                    DateOfBirth = l.DateOfBirth == null ? "" : l.DateOfBirth.Value.ToString("yyyy-MM-dd"),
-                    TotalClaim = l.ChargeAmount.ToString("C"),
-                    TotalClaimRaw = l.ChargeAmount,
-                    CPTCode = l.CPTCode,
-                    CPTDescription = l.Description
-                });
+                StatementDate = l.Date == null ? "" : ((DateTime)l.Date).ToString("yyyy-MM-dd"),
+                ClaimNumber = l.ClaimNumber,
+                FullName = l.NameLastName + (string.IsNullOrEmpty(l.NameFirstName) ? "" : (", " + l.NameFirstName)) + (string.IsNullOrEmpty(l.NameMiddleName) ? "" : (" " + l.NameMiddleName)),
+                DateOfBirth = l.DateOfBirth == null ? "" : l.DateOfBirth.Value.ToString("yyyy-MM-dd"),
+                TotalClaim = l.ChargeAmount.ToString("C"),
+                TotalClaimRaw = l.ChargeAmount,
+                CPTCode = l.CPTCode,
+                CPTDescription = l.Description
+            }).Take(5000);
 
-                return Json(result, "Providers Claims", JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                var cm = (from prv in con.MC_Provider
-                          join svc in con.MC_Service on prv.ClaimID equals svc.ClaimID
-                          join cpt in con.MC_CPTCodes on svc.ProcedureCode equals cpt.CPTCode into oj
-                          from cptOuter in oj.DefaultIfEmpty()
-                          join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
-                          join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
-                          where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
-                              && prv.Npi == providerNPI
-                          orderby svc.Date, clm.ClaimNumber, pat.NameLastName, pat.NameFirstName, pat.NameMiddleName ascending
-                          select new { svc.Date, clm.ClaimNumber, pat.NameLastName, pat.NameFirstName, pat.NameMiddleName, pat.DateOfBirth, svc.ChargeAmount, cptOuter.CPTCode, cptOuter.Description });
-
-                var result = cm.ToList().Select(l => new
-                {
-                    StatementDate = l.Date == null ? "" : ((DateTime)l.Date).ToString("yyyy-MM-dd"),
-                    ClaimNumber = l.ClaimNumber,
-                    FullName = l.NameLastName + (string.IsNullOrEmpty(l.NameFirstName) ? "" : (", " + l.NameFirstName)) + (string.IsNullOrEmpty(l.NameMiddleName) ? "" : (" " + l.NameMiddleName)),
-                    DateOfBirth = l.DateOfBirth == null ? "" : l.DateOfBirth.Value.ToString("yyyy-MM-dd"),
-                    TotalClaim = l.ChargeAmount.ToString("C"),
-                    TotalClaimRaw = l.ChargeAmount,
-                    CPTCode = l.CPTCode,
-                    CPTDescription = l.Description
-                });
-
-                return Json(result, "Providers Claims", JsonRequestBehavior.AllowGet);
-            }
+            return Json(result, "Providers Claims", JsonRequestBehavior.AllowGet);
         }
 
-        public async Task<ActionResult> GetClaimantsResults(string startDate, string endDate, string claimantID, string lowerBoundClaimAmount, string upperBoundClaimAmount)
-        {
-            var con = new Sweeper_DAL.SweeperUIEntitiesQA();
-
-            var manager = ClaimsManager;
-
-            var master = manager.checkAccess(new string[] { UMSClaims.CLAIM_DEV, UMSClaims.CLAIM_USHC_ADMIN, UMSClaims.CLAIM_MASTER });
-
-            DateTime startDateTime = GetDateFromString(startDate, new DateTime(2000, 1, 1));
-            DateTime endDateTime = GetDateFromString(endDate, DateTime.Now);
-            decimal lowerBoundClaimAmountAsDecimal = GetClaimAmountFromString(lowerBoundClaimAmount, 0);
-            decimal upperBoundClaimAmountAsDecimal = GetClaimAmountFromString(upperBoundClaimAmount, 99999999);
-
-            if (string.IsNullOrWhiteSpace(claimantID))
-            {
-                var cmClaims = (from pat in con.MC_Patient
-                          join svc in con.MC_Service on pat.ClaimID equals svc.ClaimID
-                          where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
-                          group new { pat, svc } by new { pat.NameLastName, pat.NameFirstName, pat.NameMiddleName, pat.DateOfBirth, pat.MemberId, pat.PlanNumber, pat.GroupNumber } into g
-                          select new
-                          {
-                              FullName = g.Key.NameLastName + (string.IsNullOrEmpty(g.Key.NameFirstName) ? "" : (", " + g.Key.NameFirstName)) + (string.IsNullOrEmpty(g.Key.NameMiddleName) ? "" : (" " + g.Key.NameMiddleName)),
-                              g.Key.DateOfBirth,
-                              g.Key.MemberId,
-                              g.Key.PlanNumber,
-                              g.Key.GroupNumber,
-                              ClaimCount = g.Count(),
-                              ClaimTotalRaw = g.Sum(i => i.svc.ChargeAmount),
-                              ClaimMaximumRaw = g.Max(i => i.svc.ChargeAmount),
-                              ClaimAverageRaw = g.Average(i => i.svc.ChargeAmount)
-                          });
-
-                var cmEvents = (from pat in con.MC_Patient
-                                join svc in con.MC_Service on pat.ClaimID equals svc.ClaimID
-                                join clm in con.MC_Claim on pat.ClaimID equals clm.ClaimID
-                                where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
-                                group new { pat, clm } by new { pat.NameLastName, pat.NameFirstName, pat.NameMiddleName, pat.DateOfBirth, pat.MemberId, pat.PlanNumber, pat.GroupNumber } into g
-                                select new
-                                {
-                                    FullName = g.Key.NameLastName + (string.IsNullOrEmpty(g.Key.NameFirstName) ? "" : (", " + g.Key.NameFirstName)) + (string.IsNullOrEmpty(g.Key.NameMiddleName) ? "" : (" " + g.Key.NameMiddleName)),
-                                    g.Key.DateOfBirth,
-                                    g.Key.MemberId,
-                                    EventCount = g.Select(i => i.clm.ClaimID).Distinct().Count()
-                                });
-
-                var cm = (from clm in cmClaims
-                          join evt in cmEvents on new { clm.FullName, clm.DateOfBirth, clm.MemberId } equals new { evt.FullName, evt.DateOfBirth, evt.MemberId }
-                          select new
-                          {
-                              clm.FullName,
-                              clm.DateOfBirth,
-                              clm.MemberId,
-                              clm.PlanNumber,
-                              clm.GroupNumber,
-                              evt.EventCount,
-                              clm.ClaimCount,
-                              clm.ClaimTotalRaw,
-                              clm.ClaimMaximumRaw,
-                              clm.ClaimAverageRaw
-                          });
-
-                var result = cm.ToList().Select(l => new
-                {
-                    l.FullName,
-                    l.DateOfBirth,
-                    l.MemberId,
-                    l.PlanNumber,
-                    l.GroupNumber,
-                    l.EventCount,
-                    l.ClaimCount,
-                    ClaimTotal = l.ClaimTotalRaw.ToString("C"),
-                    l.ClaimTotalRaw,
-                    ClaimMaximum = l.ClaimMaximumRaw.ToString("C"),
-                    l.ClaimMaximumRaw,
-                    ClaimAverage = l.ClaimAverageRaw.ToString("C"),
-                    l.ClaimAverageRaw
-                });
-
-                return Json(result, "Claimants", JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                var cmClaims = (from pat in con.MC_Patient
-                                join svc in con.MC_Service on pat.ClaimID equals svc.ClaimID
-                                where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
-                                    && pat.MemberId == claimantID
-                                group new { pat, svc } by new { pat.NameLastName, pat.NameFirstName, pat.NameMiddleName, pat.DateOfBirth, pat.MemberId, pat.PlanNumber, pat.GroupNumber } into g
-                                select new
-                                {
-                                    FullName = g.Key.NameLastName + (string.IsNullOrEmpty(g.Key.NameFirstName) ? "" : (", " + g.Key.NameFirstName)) + (string.IsNullOrEmpty(g.Key.NameMiddleName) ? "" : (" " + g.Key.NameMiddleName)),
-                                    g.Key.DateOfBirth,
-                                    g.Key.MemberId,
-                                    g.Key.PlanNumber,
-                                    g.Key.GroupNumber,
-                                    ClaimCount = g.Count(),
-                                    ClaimTotalRaw = g.Sum(i => i.svc.ChargeAmount),
-                                    ClaimMaximumRaw = g.Max(i => i.svc.ChargeAmount),
-                                    ClaimAverageRaw = g.Average(i => i.svc.ChargeAmount)
-                                });
-
-                var cmEvents = (from pat in con.MC_Patient
-                                join svc in con.MC_Service on pat.ClaimID equals svc.ClaimID
-                                join clm in con.MC_Claim on pat.ClaimID equals clm.ClaimID
-                                where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
-                                group new { pat, clm } by new { pat.NameLastName, pat.NameFirstName, pat.NameMiddleName, pat.DateOfBirth, pat.MemberId, pat.PlanNumber, pat.GroupNumber } into g
-                                select new
-                                {
-                                    FullName = g.Key.NameLastName + (string.IsNullOrEmpty(g.Key.NameFirstName) ? "" : (", " + g.Key.NameFirstName)) + (string.IsNullOrEmpty(g.Key.NameMiddleName) ? "" : (" " + g.Key.NameMiddleName)),
-                                    g.Key.DateOfBirth,
-                                    g.Key.MemberId,
-                                    EventCount = g.Select(i => i.clm.ClaimID).Distinct().Count()
-                                });
-
-                var cm = (from clm in cmClaims
-                          join evt in cmEvents on new { clm.FullName, clm.DateOfBirth, clm.MemberId } equals new { evt.FullName, evt.DateOfBirth, evt.MemberId }
-                          select new
-                          {
-                              clm.FullName,
-                              clm.DateOfBirth,
-                              clm.MemberId,
-                              clm.PlanNumber,
-                              clm.GroupNumber,
-                              evt.EventCount,
-                              clm.ClaimCount,
-                              clm.ClaimTotalRaw,
-                              clm.ClaimMaximumRaw,
-                              clm.ClaimAverageRaw
-                          });
-
-                var result = cm.ToList().Select(l => new
-                {
-                    l.FullName,
-                    l.DateOfBirth,
-                    l.MemberId,
-                    l.PlanNumber,
-                    l.GroupNumber,
-                    l.EventCount,
-                    l.ClaimCount,
-                    ClaimTotal = l.ClaimTotalRaw.ToString("C"),
-                    l.ClaimTotalRaw,
-                    ClaimMaximum = l.ClaimMaximumRaw.ToString("C"),
-                    l.ClaimMaximumRaw,
-                    ClaimAverage = l.ClaimAverageRaw.ToString("C"),
-                    l.ClaimAverageRaw
-                });
-
-                return Json(result, "Claimants", JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        public async Task<ActionResult> GetProceduresCodeResults(string startDate, string endDate, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount)
+        public async Task<ActionResult> GetProceduresCodeResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber)
         {
             var con = new Sweeper_DAL.SweeperUIEntitiesQA();
 
@@ -945,8 +989,12 @@ namespace SweeperUI.Controllers
             var cmClaims = (from svc in con.MC_Service
                             join cpt in con.MC_CPTCodes on svc.ProcedureCode equals cpt.CPTCode into oj
                             from cptOuter in oj.DefaultIfEmpty()
+                            join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                            join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
                             where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
                                   && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                  && (claimantID == "" || claimantID == pat.MemberId)
+                                  && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                             group new { svc } by new { svc.ProcedureCode, cptOuter.Description } into g
                             select new
                             {
@@ -962,8 +1010,11 @@ namespace SweeperUI.Controllers
                             join cpt in con.MC_CPTCodes on svc.ProcedureCode equals cpt.CPTCode into oj
                             from cptOuter in oj.DefaultIfEmpty()
                             join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                            join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
                             where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
                                   && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                  && (claimantID == "" || claimantID == pat.MemberId)
+                                  && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                             group new { svc, clm } by new { svc.ProcedureCode } into g
                             select new
                             {
@@ -976,6 +1027,10 @@ namespace SweeperUI.Controllers
                                from cptOuter in oj.DefaultIfEmpty()
                                join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
                                join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                                group new { svc, pat } by new { svc.ProcedureCode } into g
                                select new
                                {
@@ -986,20 +1041,30 @@ namespace SweeperUI.Controllers
             var cmEmployees = (from svc in con.MC_Service
                                join cpt in con.MC_CPTCodes on svc.ProcedureCode equals cpt.CPTCode into oj
                                from cptOuter in oj.DefaultIfEmpty()
-                              join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
-                              join sub in con.MC_Subscriber on svc.ClaimID equals sub.ClaimID
-                              group new { svc, sub } by new { svc.ProcedureCode } into g
-                              select new
-                              {
-                                  g.Key.ProcedureCode,
-                                  EmployeeCount = g.Select(x => x.sub.MemberId).Distinct().Count()
-                              });
+                               join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
+                               join sub in con.MC_Subscriber on svc.ClaimID equals sub.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                               group new { svc, sub } by new { svc.ProcedureCode } into g
+                               select new
+                               {
+                                   g.Key.ProcedureCode,
+                                   EmployeeCount = g.Select(x => x.sub.MemberId).Distinct().Count()
+                               });
 
             var cmProviders = (from svc in con.MC_Service
                                join cpt in con.MC_CPTCodes on svc.ProcedureCode equals cpt.CPTCode into oj
                                from cptOuter in oj.DefaultIfEmpty()
                                join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
                                join prv in con.MC_Provider on svc.ClaimID equals prv.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                                group new { svc, prv } by new { svc.ProcedureCode } into g
                                select new
                                {
@@ -1047,7 +1112,7 @@ namespace SweeperUI.Controllers
             return Json(result, "Procedures by Code", JsonRequestBehavior.AllowGet);
         }
 
-        public async Task<ActionResult> GetProceduresCodeClaimsResults(string startDate, string endDate, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount)
+        public async Task<ActionResult> GetProceduresCodeClaimsResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber)
         {
             var con = new Sweeper_DAL.SweeperUIEntitiesQA();
 
@@ -1077,6 +1142,8 @@ namespace SweeperUI.Controllers
                       join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
                       where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
                             && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                            && (claimantID == "" || claimantID == pat.MemberId)
+                            && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                       orderby svc.Date, clm.ClaimNumber, pat.NameLastName, pat.NameFirstName, pat.NameMiddleName ascending
                       select new { svc.Date, clm.ClaimNumber, pat.NameLastName, pat.NameFirstName, pat.NameMiddleName, pat.DateOfBirth, svc.ChargeAmount, cptOuter.CPTCode, cptOuter.Description });
 
@@ -1095,7 +1162,7 @@ namespace SweeperUI.Controllers
             return Json(result, "Procedures by Code Claims", JsonRequestBehavior.AllowGet);
         }
 
-        public async Task<ActionResult> GetProceduresGroupResults(string startDate, string endDate, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount)
+        public async Task<ActionResult> GetProceduresGroupResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber)
         {
             var con = new Sweeper_DAL.SweeperUIEntitiesQA();
 
@@ -1120,8 +1187,12 @@ namespace SweeperUI.Controllers
 
             var cmClaims = (from svc in con.MC_Service
                             join cg in con.MC_CPTGroups on svc.GroupId equals cg.GroupId
+                            join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                            join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
                             where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
                                   && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                  && (claimantID == "" || claimantID == pat.MemberId)
+                                  && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                             group new { svc, cg } by new { cg.GroupFromCode, cg.GroupToCode, cg.GroupName } into g
                             select new
                             {
@@ -1136,8 +1207,11 @@ namespace SweeperUI.Controllers
             var cmEvents = (from svc in con.MC_Service
                             join cg in con.MC_CPTGroups on svc.GroupId equals cg.GroupId
                             join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                            join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
                             where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
                                   && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                  && (claimantID == "" || claimantID == pat.MemberId)
+                                  && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                             group new { cg, clm } by new { cg.GroupFromCode, cg.GroupToCode, cg.GroupName } into g
                             select new
                             {
@@ -1146,31 +1220,45 @@ namespace SweeperUI.Controllers
                             });
 
             var cmClaimants = (from svc in con.MC_Service
-                              join cg in con.MC_CPTGroups on svc.GroupId equals cg.GroupId
-                              join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
-                              join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
-                              group new { cg, pat } by new { cg.GroupFromCode, cg.GroupToCode } into g
-                              select new
-                              {
-                                  ProcedureGroup = g.Key.GroupFromCode + "-" + g.Key.GroupToCode,
-                                  ClaimantCount = g.Select(x => x.pat.MemberId).Distinct().Count()
-                              });
+                               join cg in con.MC_CPTGroups on svc.GroupId equals cg.GroupId
+                               join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                               group new { cg, pat } by new { cg.GroupFromCode, cg.GroupToCode } into g
+                               select new
+                               {
+                                   ProcedureGroup = g.Key.GroupFromCode + "-" + g.Key.GroupToCode,
+                                   ClaimantCount = g.Select(x => x.pat.MemberId).Distinct().Count()
+                               });
 
             var cmEmployees = (from svc in con.MC_Service
-                              join cg in con.MC_CPTGroups on svc.GroupId equals cg.GroupId
-                              join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
-                              join sub in con.MC_Subscriber on svc.ClaimID equals sub.ClaimID
-                              group new { cg, sub } by new { cg.GroupFromCode, cg.GroupToCode } into g
-                              select new
-                              {
-                                  ProcedureGroup = g.Key.GroupFromCode + "-" + g.Key.GroupToCode,
-                                  EmployeeCount = g.Select(x => x.sub.MemberId).Distinct().Count()
-                              });
+                               join cg in con.MC_CPTGroups on svc.GroupId equals cg.GroupId
+                               join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
+                               join sub in con.MC_Subscriber on svc.ClaimID equals sub.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                               group new { cg, sub } by new { cg.GroupFromCode, cg.GroupToCode } into g
+                               select new
+                               {
+                                   ProcedureGroup = g.Key.GroupFromCode + "-" + g.Key.GroupToCode,
+                                   EmployeeCount = g.Select(x => x.sub.MemberId).Distinct().Count()
+                               });
 
             var cmProviders = (from svc in con.MC_Service
                                join cg in con.MC_CPTGroups on svc.GroupId equals cg.GroupId
                                join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
                                join prv in con.MC_Provider on svc.ClaimID equals prv.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                                group new { cg, prv } by new { cg.GroupFromCode, cg.GroupToCode } into g
                                select new
                                {
@@ -1218,7 +1306,7 @@ namespace SweeperUI.Controllers
             return Json(result, "Procedures by Group", JsonRequestBehavior.AllowGet);
         }
 
-        public async Task<ActionResult> GetProceduresSubgroupResults(string startDate, string endDate, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount)
+        public async Task<ActionResult> GetProceduresSubgroupResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber)
         {
             var con = new Sweeper_DAL.SweeperUIEntitiesQA();
 
@@ -1243,8 +1331,12 @@ namespace SweeperUI.Controllers
 
             var cmClaims = (from svc in con.MC_Service
                             join csg in con.MC_CPTSubgroups on svc.SubgroupId equals csg.SubgroupId
+                            join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                            join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
                             where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
                                   && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                  && (claimantID == "" || claimantID == pat.MemberId)
+                                  && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                             group new { csg, svc } by new { csg.SubgroupFromCode, csg.SubgroupToCode, csg.SubgroupName } into g
                             select new
                             {
@@ -1259,8 +1351,11 @@ namespace SweeperUI.Controllers
             var cmEvents = (from svc in con.MC_Service
                             join csg in con.MC_CPTSubgroups on svc.SubgroupId equals csg.SubgroupId
                             join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                            join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
                             where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
                                   && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                  && (claimantID == "" || claimantID == pat.MemberId)
+                                  && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                             group new { csg, clm } by new { csg.SubgroupFromCode, csg.SubgroupToCode, csg.SubgroupName } into g
                             select new
                             {
@@ -1269,31 +1364,45 @@ namespace SweeperUI.Controllers
                             });
 
             var cmClaimants = (from svc in con.MC_Service
-                              join csg in con.MC_CPTSubgroups on svc.SubgroupId equals csg.SubgroupId
-                              join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
-                              join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
-                              group new { csg, pat } by new { csg.SubgroupFromCode, csg.SubgroupToCode } into g
-                              select new
-                              {
-                                  ProcedureSubgroup = g.Key.SubgroupFromCode + "-" + g.Key.SubgroupToCode,
-                                  ClaimantCount = g.Select(x => x.pat.MemberId).Distinct().Count()
-                              });
+                               join csg in con.MC_CPTSubgroups on svc.SubgroupId equals csg.SubgroupId
+                               join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                               group new { csg, pat } by new { csg.SubgroupFromCode, csg.SubgroupToCode } into g
+                               select new
+                               {
+                                   ProcedureSubgroup = g.Key.SubgroupFromCode + "-" + g.Key.SubgroupToCode,
+                                   ClaimantCount = g.Select(x => x.pat.MemberId).Distinct().Count()
+                               });
 
             var cmEmployees = (from svc in con.MC_Service
-                              join csg in con.MC_CPTSubgroups on svc.SubgroupId equals csg.SubgroupId
-                              join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
-                              join sub in con.MC_Subscriber on svc.ClaimID equals sub.ClaimID
-                              group new { csg, sub } by new { csg.SubgroupFromCode, csg.SubgroupToCode } into g
-                              select new
-                              {
-                                  ProcedureSubgroup = g.Key.SubgroupFromCode + "-" + g.Key.SubgroupToCode,
-                                  EmployeeCount = g.Select(x => x.sub.MemberId).Distinct().Count()
-                              });
+                               join csg in con.MC_CPTSubgroups on svc.SubgroupId equals csg.SubgroupId
+                               join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
+                               join sub in con.MC_Subscriber on svc.ClaimID equals sub.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
+                               group new { csg, sub } by new { csg.SubgroupFromCode, csg.SubgroupToCode } into g
+                               select new
+                               {
+                                   ProcedureSubgroup = g.Key.SubgroupFromCode + "-" + g.Key.SubgroupToCode,
+                                   EmployeeCount = g.Select(x => x.sub.MemberId).Distinct().Count()
+                               });
 
             var cmProviders = (from svc in con.MC_Service
                                join csg in con.MC_CPTSubgroups on svc.SubgroupId equals csg.SubgroupId
                                join clm in con.MC_Claim on svc.ClaimID equals clm.ClaimID
+                               join pat in con.MC_Patient on svc.ClaimID equals pat.ClaimID
                                join prv in con.MC_Provider on svc.ClaimID equals prv.ClaimID
+                               where svc.Date >= startDateTime && svc.Date <= endDateTime && svc.ChargeAmount >= lowerBoundClaimAmountAsDecimal && svc.ChargeAmount <= upperBoundClaimAmountAsDecimal
+                                     && string.Compare(svc.ProcedureCode, lowerBoundCPT) != -1 && string.Compare(svc.ProcedureCode, upperBoundCPT) != 1
+                                     && (claimantID == "" || claimantID == pat.MemberId)
+                                     && (claimNumber == "" || claimNumber == clm.ClaimNumber)
                                group new { csg, prv } by new { csg.SubgroupFromCode, csg.SubgroupToCode } into g
                                select new
                                {
@@ -1366,13 +1475,33 @@ namespace SweeperUI.Controllers
             return File(DumpExcel(LINQToDataTable(result)), "application/Snapshot.xlsx", "Snapshot.xlsx");
         }
 
-        public ActionResult DownloadDiagnosesICDResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundClaimAmount, string upperBoundClaimAmount)
+        public ActionResult DownloadDiagnosesICDResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber)
         {
             var con = new Sweeper_DAL.SweeperUIEntitiesQA();
 
             var manager = ClaimsManager;
 
             var master = manager.checkAccess(new string[] { UMSClaims.CLAIM_DEV, UMSClaims.CLAIM_USHC_ADMIN, UMSClaims.CLAIM_MASTER });
+
+            if (string.IsNullOrWhiteSpace(lowerBoundICD))
+            {
+                lowerBoundICD = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundICD))
+            {
+                upperBoundICD = "999999";
+            }
+
+            if (string.IsNullOrWhiteSpace(lowerBoundCPT))
+            {
+                lowerBoundCPT = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundCPT))
+            {
+                upperBoundCPT = "999999";
+            }
 
             var cmClaims = (from d in con.MC_Diagnosis
                             join icd9 in con.MC_ICD9 on d.CodeNoDot equals icd9.Code
@@ -1462,13 +1591,33 @@ namespace SweeperUI.Controllers
             return File(DumpExcel(LINQToDataTable(result)), "application/Snapshot.xlsx", "Snapshot.xlsx");
         }
 
-        public ActionResult DownloadDiagnosesICDClaimsResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundClaimAmount, string upperBoundClaimAmount)
+        public ActionResult DownloadDiagnosesICDClaimsResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber)
         {
             var con = new Sweeper_DAL.SweeperUIEntitiesQA();
 
             var manager = ClaimsManager;
 
             var master = manager.checkAccess(new string[] { UMSClaims.CLAIM_DEV, UMSClaims.CLAIM_USHC_ADMIN, UMSClaims.CLAIM_MASTER });
+
+            if (string.IsNullOrWhiteSpace(lowerBoundICD))
+            {
+                lowerBoundICD = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundICD))
+            {
+                upperBoundICD = "999999";
+            }
+
+            if (string.IsNullOrWhiteSpace(lowerBoundCPT))
+            {
+                lowerBoundCPT = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundCPT))
+            {
+                upperBoundCPT = "999999";
+            }
 
             var cmClaims = (from d in con.MC_Diagnosis
                             join icd9 in con.MC_ICD9 on d.CodeNoDot equals icd9.Code
@@ -1558,13 +1707,33 @@ namespace SweeperUI.Controllers
             return File(DumpExcel(LINQToDataTable(result)), "application/Snapshot.xlsx", "Snapshot.xlsx");
         }
 
-        public ActionResult DownloadDiagnosesGroupResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundClaimAmount, string upperBoundClaimAmount)
+        public ActionResult DownloadDiagnosesGroupResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber)
         {
             var con = new Sweeper_DAL.SweeperUIEntitiesQA();
 
             var manager = ClaimsManager;
 
             var master = manager.checkAccess(new string[] { UMSClaims.CLAIM_DEV, UMSClaims.CLAIM_USHC_ADMIN, UMSClaims.CLAIM_MASTER });
+
+            if (string.IsNullOrWhiteSpace(lowerBoundICD))
+            {
+                lowerBoundICD = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundICD))
+            {
+                upperBoundICD = "999999";
+            }
+
+            if (string.IsNullOrWhiteSpace(lowerBoundCPT))
+            {
+                lowerBoundCPT = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundCPT))
+            {
+                upperBoundCPT = "999999";
+            }
 
             var cmClaims = (from d in con.MC_Diagnosis
                             join dg in con.MC_DiagnosticGroups on d.GroupId.Value equals dg.GroupId
@@ -1651,13 +1820,33 @@ namespace SweeperUI.Controllers
             return File(DumpExcel(LINQToDataTable(result)), "application/Snapshot.xlsx", "Snapshot.xlsx");
         }
 
-        public ActionResult DownloadDiagnosesSubgroupResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundClaimAmount, string upperBoundClaimAmount)
+        public ActionResult DownloadDiagnosesSubgroupResults(string startDate, string endDate, string lowerBoundICD, string upperBoundICD, string lowerBoundCPT, string upperBoundCPT, string lowerBoundClaimAmount, string upperBoundClaimAmount, string claimantID, string claimNumber)
         {
             var con = new Sweeper_DAL.SweeperUIEntitiesQA();
 
             var manager = ClaimsManager;
 
             var master = manager.checkAccess(new string[] { UMSClaims.CLAIM_DEV, UMSClaims.CLAIM_USHC_ADMIN, UMSClaims.CLAIM_MASTER });
+
+            if (string.IsNullOrWhiteSpace(lowerBoundICD))
+            {
+                lowerBoundICD = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundICD))
+            {
+                upperBoundICD = "999999";
+            }
+
+            if (string.IsNullOrWhiteSpace(lowerBoundCPT))
+            {
+                lowerBoundCPT = "0";
+            }
+
+            if (string.IsNullOrWhiteSpace(upperBoundCPT))
+            {
+                upperBoundCPT = "999999";
+            }
 
             var cmClaims = (from d in con.MC_Diagnosis
                             join dsg in con.MC_DiagnosticSubgroups on d.SubgroupId.Value equals dsg.SubgroupId
@@ -2181,14 +2370,24 @@ namespace SweeperUI.Controllers
 
             var master = manager.checkAccess(new string[] { UMSClaims.CLAIM_DEV, UMSClaims.CLAIM_USHC_ADMIN, UMSClaims.CLAIM_MASTER });
 
-            var cm = (from svc in con.MC_Service
-                      select svc.ChargeAmount).ToList();
- 
-            var result = new {
-                Count = cm.Count.ToString(),
-                Total = cm.Sum(s => s).ToString(),
-                Maximum = cm.Max(m => m).ToString(),
-                Average = cm.Average(a => a).ToString()
+            var cmClaims = (from svc in con.MC_Service  
+                            select svc.ChargeAmount).ToList();
+
+            var cmMembers = (from pat in con.MC_Patient
+                             select pat.MemberId).ToList();
+
+            var cmEmployees = (from pat in con.MC_Patient
+                               where pat.RelationshipCode == "18"
+                               select pat.MemberId).ToList();
+
+            var result = new
+            {
+                Count = cmClaims.Count.ToString(),
+                Total = cmClaims.Sum(s => s).ToString("C"),
+                Maximum = cmClaims.Max(m => m).ToString("C"),
+                Average = cmClaims.Average(a => a).ToString("C"),
+                MemberCount = cmMembers.Count,
+                EmployeeCount = cmEmployees.Count
             };
 
             return Json(result, "Full Claims Summary", JsonRequestBehavior.AllowGet);
@@ -2205,21 +2404,33 @@ namespace SweeperUI.Controllers
             DateTime startDateTime = GetDateFromString(startDate, new DateTime(2000, 1, 1));
             DateTime endDateTime = GetDateFromString(endDate, DateTime.Now);
 
-            var cm = (from svc in con.MC_Service
-                      where svc.Date >= startDateTime && svc.Date <= endDateTime
-                      select svc.ChargeAmount).ToList();
+            var cmClaims = (from svc in con.MC_Service
+                            where svc.Date >= startDateTime && svc.Date <= endDateTime
+                            select svc.ChargeAmount).ToList();
+
+            var cmMembers = (from pat in con.MC_Patient
+                             join clm in con.MC_Claim on pat.ClaimID equals clm.ClaimID
+                             where clm.SerializableStatementFromDate >= startDateTime && clm.SerializableStatementFromDate <= endDateTime
+                             select pat.MemberId).ToList();
+
+            var cmEmployees = (from pat in con.MC_Patient
+                               join clm in con.MC_Claim on pat.ClaimID equals clm.ClaimID
+                               where clm.SerializableStatementFromDate >= startDateTime && clm.SerializableStatementFromDate <= endDateTime
+                                     && pat.RelationshipCode == "18"
+                               select pat.MemberId).ToList();
 
             var result = new
             {
-                Count = cm.Count.ToString(),
-                Total = cm.Sum(s => s).ToString(),
-                Maximum = cm.Max(m => m).ToString(),
-                Average = cm.Average(a => a).ToString()
+                Count = cmClaims.Count.ToString(),
+                Total = cmClaims.Sum(s => s).ToString("C"),
+                Maximum = cmClaims.Max(m => m).ToString("C"),
+                Average = cmClaims.Average(a => a).ToString("C"),
+                MemberCount = cmMembers.Count,
+                EmployeeCount = cmEmployees.Count
             };
 
             return Json(result, "Filtered Claims Summary", JsonRequestBehavior.AllowGet);
         }
-
 
         private decimal GetClaimAmountFromString(string claimAmountAsString, decimal defaultValue)
         {
