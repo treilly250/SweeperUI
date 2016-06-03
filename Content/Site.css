@@ -3,10 +3,11 @@
     padding-bottom: 20px;
 }
 
-/* Set padding to keep content from hitting the edges */
+/* Set padding to keep content from hitting the edges, and min-width to keep from wrapping columns */
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
+    min-width: 1500px;
 }
 
 /* Set width on the form input elements since they're 100% wide by default */
